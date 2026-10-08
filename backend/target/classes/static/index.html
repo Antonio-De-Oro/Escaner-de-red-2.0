@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner de Red - Arduino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #21a9f1 0%, rgb(83, 36, 159) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: #181b3b;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #startBtn {
+            background: linear-gradient(135deg, #21a9f1 0%, rgb(83, 36, 159) 100%);
+            color: white;
+        }
+
+        #startBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status.ready { background: #d4edda; color: #155724; }
+        .status.scanning { background: #fff3cd; color: #856404; }
+        .status.complete { background: #d1ecf1; color: #0c5460; }
+        .status.error { background: #f8d7da; color: #721c24; }
+
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .scan-info {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+
+        .scan-info div {
+            text-align: center;
+        }
+
+        .scan-info strong {
+            display: block;
+            font-size: 1.5em;
+            color: #667eea;
+            margin-top: 5px;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .device-row {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            background: #181b3b;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+
+        footer strong {
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status disconnected" id="wsStatus">● Desconectado</div>
+
+    <div class="container">
+        <header>
+            <img src="logo.png" alt="VULNERASOLVE" class="logo">
+            <h1>Escáner de Red</h1>
+            <p class="subtitle">Arduino UNO + ENC28J60</p>
+        </header>
+
+        <div class="content">
+            <div class="status ready" id="status">
+                Listo para escanear
+            </div>
+
+            <div class="control-panel">
+                <button id="startBtn" onclick="startScan()">Iniciar Escaneo</button>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="scan-info">
+                    <div>
+                        <span>Progreso</span>
+                        <strong id="currentIP">0/254</strong>
+                    </div>
+                    <div>
+                        <span>Dispositivos</span>
+                        <strong id="devicesFound">0</strong>
+                    </div>
+                    <div>
+                        <span>Tiempo</span>
+                        <strong id="elapsedTime">0s</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results" id="results">
+                <h2 style="margin-bottom: 15px; color: #667eea;">Dispositivos Encontrados</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Dirección IP</th>
+                                <th>Dirección MAC</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deviceTable">
+                            <tr class="no-data">
+                                <td colspan="3">Sin dispositivos detectados</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <strong>VULNERASOLVE</strong><br>
+            Todos los derechos reservados &copy; 2025
+        </footer>
+    </div>
+
+    <!-- SockJS y STOMP para WebSocket -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+    <script>
+        let stompClient = null;
+        let devices = [];
+        let scanStartTime = null;
+        let timerInterval = null;
+
+        // Conectar WebSocket al iniciar
+        window.onload = function() {
+            connectWebSocket();
+        };
+
+        function connectWebSocket() {
+            const socket = new SockJS('http://localhost:8080/ws');
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function(frame) {
+                console.log('WebSocket conectado');
+                document.getElementById('wsStatus').textContent = '● Conectado';
+                document.getElementById('wsStatus').className = 'connection-status connected';
+
+                // Suscribirse al topic de escaneo
+                stompClient.subscribe('/topic/scan', function(message) {
+                    const data = JSON.parse(message.body);
+                    handleScanMessage(data);
+                });
+            }, function(error) {
+                console.error('Error WebSocket:', error);
+                document.getElementById('wsStatus').textContent = '● Desconectado';
+                document.getElementById('wsStatus').className = 'connection-status disconnected';
+                
+                // Reintentar conexión en 3 segundos
+                setTimeout(connectWebSocket, 3000);
+            });
+        }
+
+        function startScan() {
+            fetch('http://localhost:8080/api/scan', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Escaneo iniciado:', data);
+                devices = [];
+                updateStatus('Iniciando escaneo...', 'scanning');
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('progressContainer').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                updateStatus('Error al iniciar escaneo', 'error');
+            });
+        }
+
+        function handleScanMessage(data) {
+            console.log('Mensaje recibido:', data);
+
+            switch(data.type) {
+                case 'ready':
+                    updateStatus('Arduino listo', 'ready');
+                    break;
+
+                case 'scan_start':
+                    scanStartTime = Date.now();
+                    startTimer();
+                    updateStatus('Escaneando red...', 'scanning');
+                    break;
+
+                case 'ip':
+                    updateStatus(`IP: ${data.ip} | Gateway: ${data.gw}`, 'scanning');
+                    break;
+
+                case 'progress':
+                    // Usar el número real de dispositivos detectados (devices.length) en lugar de confiar en 'found'
+                    updateProgress(data.percent, data.current, data.total, data.found);
+                    break;
+
+                case 'device':
+                    addDevice(data.ip, data.mac, data.vendor);
+                    break;
+
+                case 'scan_complete':
+                    stopTimer();
+                    // Aseguramos consistencia usando el tamaño real del array devices
+                    updateStatus(`Escaneo completo: ${devices.length} dispositivos en ${data.time}s`, 'complete');
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('startBtn').textContent = 'Escaneo Completado';
+                    showResults();
+                    break;
+
+                case 'error':
+                    updateStatus(`Error: ${data.msg}`, 'error');
+                    document.getElementById('startBtn').disabled = false;
+                    break;
+            }
+        }
+
+        function updateStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        function updateProgress(percent, current, total, found) {
+            const fill = document.getElementById('progressFill');
+            fill.style.width = percent + '%';
+            fill.textContent = percent + '%';
+            
+            document.getElementById('currentIP').textContent = `${current}/${total}`;
+            // Mostrar siempre la cantidad real de filas en la tabla (devices.length)
+            document.getElementById('devicesFound').textContent = devices.length;
+        }
+
+        function addDevice(ip, mac, vendor) {
+            devices.push({ ip, mac, vendor });
+            updateDeviceTable();
+            // Actualizar contador inmediatamente tras agregar el dispositivo
+            document.getElementById('devicesFound').textContent = devices.length;
+        }
+
+        function updateDeviceTable() {
+            const tbody = document.getElementById('deviceTable');
+            tbody.innerHTML = '';
+            
+            devices.forEach((device, index) => {
+                const row = document.createElement('tr');
+                row.className = 'device-row';
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${device.ip}</td>
+                    <td style="font-family: monospace;">${device.mac}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function showResults() {
+            document.getElementById('results').style.display = 'block';
+            if (devices.length === 0) {
+                document.getElementById('deviceTable').innerHTML = '<tr class="no-data"><td colspan="3">No se encontraron dispositivos</td></tr>';
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (scanStartTime) {
+                    const elapsed = Math.floor((Date.now() - scanStartTime) / 1000);
+                    document.getElementById('elapsedTime').textContent = elapsed + 's';
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+    </script>
+</body>
+</html>
