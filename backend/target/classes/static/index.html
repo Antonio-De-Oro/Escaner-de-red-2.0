@@ -3,8 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escáner de Red - Arduino</title>
+    <title>VulneraSolve - Auditoría y Escáner de Red Local</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-base: #0a0e17;
+            --bg-card: rgba(18, 24, 38, 0.85);
+            --bg-card-hover: rgba(26, 34, 53, 0.95);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-focus: #00d4ff;
+            
+            --primary: #00d4ff;
+            --primary-glow: rgba(0, 212, 255, 0.35);
+            --secondary: #6366f1;
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-dark: #64748b;
+            
+            /* Niveles de Riesgo */
+            --risk-critical: #ef4444;
+            --risk-critical-bg: rgba(239, 68, 68, 0.15);
+            --risk-high: #f97316;
+            --risk-high-bg: rgba(249, 115, 22, 0.15);
+            --risk-medium: #eab308;
+            --risk-medium-bg: rgba(234, 179, 8, 0.15);
+            --risk-low: #10b981;
+            --risk-low-bg: rgba(16, 185, 129, 0.15);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,455 +41,1233 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #21a9f1 0%, rgb(83, 36, 159) 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 212, 255, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.06) 0%, transparent 40%);
+            color: var(--text-main);
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1000px;
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Top Bar & Connection Status */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto 20px auto;
+        }
+
+        .ws-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s;
+        }
+
+        .ws-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+
+        .ws-badge.connected .ws-dot {
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        .ws-badge.connected {
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .ws-badge.disconnected {
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        /* Contenedor Principal */
+        .app-container {
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Header Card */
+        .header-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 28px 36px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            position: relative;
             overflow: hidden;
         }
 
-        header {
-            background: #181b3b;
-            color: white;
-            padding: 30px;
-            text-align: center;
+        .header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
         }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .control-panel {
+        .brand-section {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
+            align-items: center;
+            gap: 20px;
         }
 
-        button {
-            padding: 15px 40px;
-            font-size: 1.1em;
-            font-weight: bold;
+        .logo-img {
+            width: 70px;
+            height: auto;
+            filter: drop-shadow(0 0 12px var(--primary-glow));
+        }
+
+        .brand-titles h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 40%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-titles p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .network-chips {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chip strong {
+            color: var(--primary);
+        }
+
+        /* Action Controls */
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 14px;
             border: none;
-            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
         }
 
-        button:hover {
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff 0%, #0284c7 100%);
+            color: #04111d;
+            box-shadow: 0 4px 20px var(--primary-glow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.55);
         }
 
-        button:active {
-            transform: translateY(0);
-        }
-
-        #startBtn {
-            background: linear-gradient(135deg, #21a9f1 0%, rgb(83, 36, 159) 100%);
-            color: white;
-        }
-
-        #startBtn:disabled {
-            background: #ccc;
+        .btn-primary:disabled {
+            background: #1e293b;
+            color: #64748b;
             cursor: not-allowed;
+            box-shadow: none;
             transform: none;
         }
 
-        .status {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            text-align: center;
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
         }
 
-        .status.ready { background: #d4edda; color: #155724; }
-        .status.scanning { background: #fff3cd; color: #856404; }
-        .status.complete { background: #d1ecf1; color: #0c5460; }
-        .status.error { background: #f8d7da; color: #721c24; }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
 
-        .progress-container {
-            margin: 20px 0;
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(4, 17, 29, 0.2);
+            border-top-color: #04111d;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
             display: none;
         }
 
-        .progress-bar {
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* KPI Grid Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 22px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .kpi-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: var(--bg-card-hover);
+        }
+
+        .kpi-card.alert-card {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.04);
+        }
+
+        .kpi-card.alert-card.has-threats {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .kpi-card.alert-card .kpi-icon {
+            color: var(--risk-critical);
+            background: var(--risk-critical-bg);
+        }
+
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .kpi-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            margin-top: 8px;
+        }
+
+        /* Barra de Progreso */
+        .progress-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px 24px;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .progress-status {
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar-bg {
             width: 100%;
-            height: 30px;
-            background: #e0e0e0;
-            border-radius: 15px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
             overflow: hidden;
             position: relative;
         }
 
-        .progress-fill {
+        .progress-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             width: 0%;
-            transition: width 0.3s;
+            background: linear-gradient(90deg, #00d4ff, #6366f1);
+            border-radius: 999px;
+            transition: width 0.3s ease-out;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* Toolbar de Filtros y Búsqueda */
+        .filter-toolbar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px 20px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        .scan-info {
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 16px 10px 42px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.25s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dark);
+            pointer-events: none;
+        }
+
+        .filter-chips-group {
             display: flex;
-            justify-content: space-around;
-            margin-top: 15px;
-            font-size: 0.95em;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .scan-info div {
-            text-align: center;
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            border-radius: 10px;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
         }
 
-        .scan-info strong {
-            display: block;
-            font-size: 1.5em;
-            color: #667eea;
-            margin-top: 5px;
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
         }
 
-        .results {
-            display: none;
+        .filter-btn.active {
+            background: var(--primary);
+            color: #04111d;
+            border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
         }
 
-        .table-container {
+        /* Tabla de Resultados */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+
+        .table-responsive {
+            width: 100%;
             overflow-x: auto;
-            margin-top: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        thead {
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
+            padding: 16px 20px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.6px;
+            white-space: nowrap;
         }
 
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            vertical-align: middle;
         }
 
-        tr:hover {
-            background: #f5f5f5;
+        tr.device-row {
+            transition: background 0.2s;
+            animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .device-row {
-            animation: fadeIn 0.5s;
+        tr.device-row:hover {
+            background: var(--bg-card-hover);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .no-data {
+        /* Badges & Pills */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-os {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .badge-type {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        /* Badges de Riesgo */
+        .risk-badge {
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: help;
+            position: relative;
+        }
+
+        .risk-BAJO {
+            background: var(--risk-low-bg);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .risk-MEDIO {
+            background: var(--risk-medium-bg);
+            color: #facc15;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .risk-ALTO {
+            background: var(--risk-high-bg);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, 0.4);
+        }
+
+        .risk-CRÍTICO {
+            background: var(--risk-critical-bg);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.6);
+            animation: pulseCritical 2s infinite;
+        }
+
+        @keyframes pulseCritical {
+            0%, 100% {
+                box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 16px rgba(239, 68, 68, 0.9);
+            }
+        }
+
+        /* Puertos */
+        .port-tag {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            color: #38bdf8;
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 2px;
+        }
+
+        .port-tag.vuln {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* Tooltip Nativo Limpio */
+        .tooltip-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip-wrap .tooltip-box {
+            visibility: hidden;
+            opacity: 0;
+            width: 250px;
+            background: #0f172a;
+            color: #e2e8f0;
+            text-align: left;
+            border-radius: 10px;
+            padding: 10px 14px;
+            position: absolute;
+            z-index: 50;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            font-size: 0.78rem;
+            line-height: 1.4;
+            transition: opacity 0.2s, visibility 0.2s;
+            pointer-events: none;
+        }
+
+        .tooltip-wrap:hover .tooltip-box {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Latencia */
+        .latency-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .latency-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        /* Estado Vacío */
+        .empty-state {
+            padding: 60px 20px;
             text-align: center;
-            padding: 40px;
-            color: #999;
-            font-size: 1.1em;
+            color: var(--text-dark);
         }
 
-        .connection-status {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .empty-state svg {
+            margin-bottom: 16px;
+            color: var(--text-dark);
+            opacity: 0.5;
         }
 
-        .connection-status.connected {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .connection-status.disconnected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .logo {
-            width: 150px;
-            height: auto;
-            margin-bottom: 15px;
-        }
-
+        /* Footer */
         footer {
-            background: #181b3b;
-            color: white;
             text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            font-size: 0.9em;
+            padding: 30px 20px;
+            color: var(--text-dark);
+            font-size: 0.85rem;
         }
 
         footer strong {
-            font-size: 1.1em;
+            color: var(--text-muted);
             letter-spacing: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .header-card { padding: 20px; }
+            .brand-titles h1 { font-size: 1.6rem; }
+            .action-bar { flex-direction: column; align-items: stretch; }
+            .btn { width: 100%; justify-content: center; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="connection-status disconnected" id="wsStatus">● Desconectado</div>
 
-    <div class="container">
-        <header>
-            <img src="logo.png" alt="VULNERASOLVE" class="logo">
-            <h1>Escáner de Red</h1>
-            <p class="subtitle">Arduino UNO + ENC28J60</p>
+    <!-- Barra Superior -->
+    <div class="top-bar">
+        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+            MOTOR DE AUDITORÍA NATIVO (HOST NIC)
+        </div>
+        <div class="ws-badge disconnected" id="wsBadge">
+            <span class="ws-dot"></span>
+            <span id="wsStatusText">Desconectado</span>
+        </div>
+    </div>
+
+    <div class="app-container">
+
+        <!-- Tarjeta Principal de Cabecera -->
+        <header class="header-card">
+            <div class="brand-section">
+                <img src="logo.png" alt="VULNERASOLVE" class="logo-img">
+                <div class="brand-titles">
+                    <h1>VULNERASOLVE</h1>
+                    <p>Auditoría de Ciberseguridad & Topología de Red Concurrente</p>
+                </div>
+            </div>
+
+            <div class="network-chips">
+                <div class="chip">
+                    <span>Subred:</span>
+                    <strong id="displaySubnet" class="mono">Detectando...</strong>
+                </div>
+                <div class="chip">
+                    <span>Host IP:</span>
+                    <strong id="displayLocalIp" class="mono">-</strong>
+                </div>
+                <div class="chip">
+                    <span>Gateway:</span>
+                    <strong id="displayGateway" class="mono">-</strong>
+                </div>
+            </div>
         </header>
 
-        <div class="content">
-            <div class="status ready" id="status">
-                Listo para escanear
+        <!-- Barra de Acciones y Control -->
+        <div class="action-bar">
+            <div class="btn-group">
+                <button class="btn btn-primary" id="startBtn" onclick="startScan()">
+                    <div class="spinner" id="btnSpinner"></div>
+                    <svg id="radarIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                        <path d="M12 6a6 6 0 1 0 6 6 6 6 0 0 0-6-6z"/>
+                        <line x1="12" y1="12" x2="16" y2="8"/>
+                    </svg>
+                    <span id="btnText">Iniciar Auditoría de Red</span>
+                </button>
+
+                <button class="btn btn-outline" onclick="exportAuditReport()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Exportar JSON
+                </button>
             </div>
 
-            <div class="control-panel">
-                <button id="startBtn" onclick="startScan()">Iniciar Escaneo</button>
-            </div>
-
-            <div class="progress-container" id="progressContainer">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill">0%</div>
-                </div>
-                <div class="scan-info">
-                    <div>
-                        <span>Progreso</span>
-                        <strong id="currentIP">0/254</strong>
-                    </div>
-                    <div>
-                        <span>Dispositivos</span>
-                        <strong id="devicesFound">0</strong>
-                    </div>
-                    <div>
-                        <span>Tiempo</span>
-                        <strong id="elapsedTime">0s</strong>
-                    </div>
-                </div>
-            </div>
-
-            <div class="results" id="results">
-                <h2 style="margin-bottom: 15px; color: #667eea;">Dispositivos Encontrados</h2>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Dirección IP</th>
-                                <th>Dirección MAC</th>
-                            </tr>
-                        </thead>
-                        <tbody id="deviceTable">
-                            <tr class="no-data">
-                                <td colspan="3">Sin dispositivos detectados</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div id="scanStatusMsg" style="font-size: 0.88rem; color: var(--text-muted); font-weight: 500;">
+                Sistema listo para auditar el segmento de red.
             </div>
         </div>
 
+        <!-- Tarjetas de Métricas KPI -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">IPs Auditadas</span>
+                    <div class="kpi-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    </div>
+                </div>
+                <div class="kpi-value mono" id="kpiScanned">0 / 254</div>
+                <div class="kpi-subtitle">Segmento CIDR completo</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Hosts Descubiertos</span>
+                    <div class="kpi-icon" style="color: #38bdf8;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                    </div>
+                </div>
+                <div class="kpi-value mono" style="color: #38bdf8;" id="kpiFound">0</div>
+                <div class="kpi-subtitle">Dispositivos activos en línea</div>
+            </div>
+
+            <div class="kpi-card alert-card" id="kpiThreatsCard">
+                <div class="kpi-header">
+                    <span class="kpi-title">Riesgo Crítico / Alto</span>
+                    <div class="kpi-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                </div>
+                <div class="kpi-value mono" style="color: var(--risk-critical);" id="kpiThreats">0</div>
+                <div class="kpi-subtitle">Puertos vulnerables expuestos</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">Tiempo de Auditoría</span>
+                    <div class="kpi-icon" style="color: #a855f7;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                </div>
+                <div class="kpi-value mono" id="kpiTime">0s</div>
+                <div class="kpi-subtitle">Tiempo transcurrido</div>
+            </div>
+        </div>
+
+        <!-- Barra de Progreso Dinámica -->
+        <div class="progress-box" id="progressBox">
+            <div class="progress-meta">
+                <span class="progress-status" id="progressStatusText">
+                    <span class="ws-dot" style="background: var(--primary); box-shadow: 0 0 8px var(--primary);"></span>
+                    Barrido de subred en ejecución...
+                </span>
+                <span class="mono" id="progressPercentText" style="font-weight: 700; color: var(--primary);">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+        </div>
+
+        <!-- Barra de Búsqueda y Filtros Rápidos -->
+        <div class="filter-toolbar">
+            <div class="search-box">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" class="search-input" id="searchInput" placeholder="Filtrar por IP, Hostname, MAC, Fabricante o SO..." oninput="handleFilterChange()">
+            </div>
+
+            <div class="filter-chips-group">
+                <button class="filter-btn active" data-filter="ALL" onclick="setRiskFilter('ALL', this)">Todos</button>
+                <button class="filter-btn" data-filter="CRÍTICO" onclick="setRiskFilter('CRÍTICO', this)">Crítico</button>
+                <button class="filter-btn" data-filter="ALTO" onclick="setRiskFilter('ALTO', this)">Alto</button>
+                <button class="filter-btn" data-filter="MEDIO" onclick="setRiskFilter('MEDIO', this)">Medio</button>
+                <button class="filter-btn" data-filter="BAJO" onclick="setRiskFilter('BAJO', this)">Bajo / Seguro</button>
+            </div>
+        </div>
+
+        <!-- Tabla Enriquecida de Resultados -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Dispositivo / Hostname</th>
+                            <th>Dirección IP / Máscara</th>
+                            <th>MAC / Fabricante</th>
+                            <th>Sistema Operativo</th>
+                            <th>Latencia</th>
+                            <th>Puertos Abiertos</th>
+                            <th>Categoría</th>
+                            <th>Nivel de Riesgo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devicesTableBody">
+                        <tr id="emptyRow">
+                            <td colspan="9">
+                                <div class="empty-state">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                                        <line x1="6" y1="6" x2="6.01" y2="6"/>
+                                        <line x1="6" y1="18" x2="6.01" y2="18"/>
+                                    </svg>
+                                    <p>No hay dispositivos auditados aún. Presiona "Iniciar Auditoría de Red".</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
         <footer>
-            <strong>VULNERASOLVE</strong><br>
-            Todos los derechos reservados &copy; 2025
+            <strong>VULNERASOLVE SECURITY SUITE &copy; 2026</strong><br>
+            Auditoría de superficie de ataque en red de área local (LAN) &bull; Spring Boot + WebSocket
         </footer>
+
     </div>
 
-    <!-- SockJS y STOMP para WebSocket -->
+    <!-- SockJS y STOMP -->
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
     <script>
         let stompClient = null;
         let devices = [];
+        let activeRiskFilter = 'ALL';
+        let scanTimer = null;
         let scanStartTime = null;
-        let timerInterval = null;
 
-        // Conectar WebSocket al iniciar
         window.onload = function() {
             connectWebSocket();
+            fetchInitialStatus();
         };
 
-        function connectWebSocket() {
-            const socket = new SockJS('http://localhost:8080/ws');
-            stompClient = Stomp.over(socket);
-            
-            stompClient.connect({}, function(frame) {
-                console.log('WebSocket conectado');
-                document.getElementById('wsStatus').textContent = '● Conectado';
-                document.getElementById('wsStatus').className = 'connection-status connected';
+        function fetchInitialStatus() {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(data => {
+                    console.log('Estado inicial del backend:', data);
+                })
+                .catch(e => console.warn('Backend aún no responde en /api/status:', e));
+        }
 
-                // Suscribirse al topic de escaneo
+        // ==========================================
+        // WebSocket STOMP Connection
+        // ==========================================
+        function connectWebSocket() {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null; // Silenciar logs extensos de STOMP en consola
+
+            stompClient.connect({}, function(frame) {
+                console.log('[WS] Conectado al broker WebSocket');
+                const badge = document.getElementById('wsBadge');
+                badge.className = 'ws-badge connected';
+                document.getElementById('wsStatusText').textContent = 'Conectado';
+
                 stompClient.subscribe('/topic/scan', function(message) {
-                    const data = JSON.parse(message.body);
-                    handleScanMessage(data);
+                    try {
+                        const data = JSON.parse(message.body);
+                        handleWebSocketMessage(data);
+                    } catch (err) {
+                        console.error('Error parseando mensaje:', err);
+                    }
                 });
             }, function(error) {
-                console.error('Error WebSocket:', error);
-                document.getElementById('wsStatus').textContent = '● Desconectado';
-                document.getElementById('wsStatus').className = 'connection-status disconnected';
-                
-                // Reintentar conexión en 3 segundos
+                console.warn('[WS] Desconectado del broker. Reintentando en 3s...', error);
+                const badge = document.getElementById('wsBadge');
+                badge.className = 'ws-badge disconnected';
+                document.getElementById('wsStatusText').textContent = 'Desconectado';
+
                 setTimeout(connectWebSocket, 3000);
             });
         }
 
+        // ==========================================
+        // Disparar Escaneo
+        // ==========================================
         function startScan() {
-            fetch('http://localhost:8080/api/scan', {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Escaneo iniciado:', data);
-                devices = [];
-                updateStatus('Iniciando escaneo...', 'scanning');
-                document.getElementById('startBtn').disabled = true;
-                document.getElementById('results').style.display = 'none';
-                document.getElementById('progressContainer').style.display = 'block';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                updateStatus('Error al iniciar escaneo', 'error');
-            });
+            const startBtn = document.getElementById('startBtn');
+            const spinner = document.getElementById('btnSpinner');
+            const radarIcon = document.getElementById('radarIcon');
+            const btnText = document.getElementById('btnText');
+
+            startBtn.disabled = true;
+            spinner.style.display = 'inline-block';
+            radarIcon.style.display = 'none';
+            btnText.textContent = 'Auditando red...';
+
+            // Reiniciar estado
+            devices = [];
+            renderDevices();
+            resetCounters();
+
+            document.getElementById('progressBox').style.display = 'block';
+            document.getElementById('scanStatusMsg').textContent = 'Solicitando inicio de escaneo a la interfaz...';
+
+            fetch('/api/scan', { method: 'POST' })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('El backend reportó un error o ya está escaneando (HTTP ' + res.status + ')');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Respuesta POST /api/scan:', data);
+                })
+                .catch(err => {
+                    console.error('Error iniciando escaneo:', err);
+                    document.getElementById('scanStatusMsg').textContent = 'Error: ' + err.message;
+                    stopScanUI();
+                });
         }
 
-        function handleScanMessage(data) {
-            console.log('Mensaje recibido:', data);
+        function stopScanUI() {
+            const startBtn = document.getElementById('startBtn');
+            const spinner = document.getElementById('btnSpinner');
+            const radarIcon = document.getElementById('radarIcon');
+            const btnText = document.getElementById('btnText');
 
-            switch(data.type) {
-                case 'ready':
-                    updateStatus('Arduino listo', 'ready');
-                    break;
+            startBtn.disabled = false;
+            spinner.style.display = 'none';
+            radarIcon.style.display = 'inline-block';
+            btnText.textContent = 'Iniciar Auditoría de Red';
 
-                case 'scan_start':
-                    scanStartTime = Date.now();
-                    startTimer();
-                    updateStatus('Escaneando red...', 'scanning');
-                    break;
-
-                case 'ip':
-                    updateStatus(`IP: ${data.ip} | Gateway: ${data.gw}`, 'scanning');
-                    break;
-
-                case 'progress':
-                    // Usar el número real de dispositivos detectados (devices.length) en lugar de confiar en 'found'
-                    updateProgress(data.percent, data.current, data.total, data.found);
-                    break;
-
-                case 'device':
-                    addDevice(data.ip, data.mac, data.vendor);
-                    break;
-
-                case 'scan_complete':
-                    stopTimer();
-                    // Aseguramos consistencia usando el tamaño real del array devices
-                    updateStatus(`Escaneo completo: ${devices.length} dispositivos en ${data.time}s`, 'complete');
-                    document.getElementById('startBtn').disabled = true;
-                    document.getElementById('startBtn').textContent = 'Escaneo Completado';
-                    showResults();
-                    break;
-
-                case 'error':
-                    updateStatus(`Error: ${data.msg}`, 'error');
-                    document.getElementById('startBtn').disabled = false;
-                    break;
+            if (scanTimer) {
+                clearInterval(scanTimer);
+                scanTimer = null;
             }
         }
 
-        function updateStatus(message, type) {
-            const statusEl = document.getElementById('status');
-            statusEl.textContent = message;
-            statusEl.className = `status ${type}`;
+        function resetCounters() {
+            document.getElementById('kpiScanned').textContent = '0 / 254';
+            document.getElementById('kpiFound').textContent = '0';
+            document.getElementById('kpiThreats').textContent = '0';
+            document.getElementById('kpiThreatsCard').classList.remove('has-threats');
+            document.getElementById('kpiTime').textContent = '0s';
+            document.getElementById('progressBarFill').style.width = '0%';
+            document.getElementById('progressPercentText').textContent = '0%';
         }
 
-        function updateProgress(percent, current, total, found) {
-            const fill = document.getElementById('progressFill');
-            fill.style.width = percent + '%';
-            fill.textContent = percent + '%';
-            
-            document.getElementById('currentIP').textContent = `${current}/${total}`;
-            // Mostrar siempre la cantidad real de filas en la tabla (devices.length)
-            document.getElementById('devicesFound').textContent = devices.length;
-        }
+        // ==========================================
+        // Procesamiento de Mensajes WebSocket
+        // ==========================================
+        function handleWebSocketMessage(data) {
+            console.log('[SCAN MSG]', data);
 
-        function addDevice(ip, mac, vendor) {
-            devices.push({ ip, mac, vendor });
-            updateDeviceTable();
-            // Actualizar contador inmediatamente tras agregar el dispositivo
-            document.getElementById('devicesFound').textContent = devices.length;
-        }
+            switch (data.type) {
+                case 'scan_start':
+                    scanStartTime = Date.now();
+                    startTimer();
 
-        function updateDeviceTable() {
-            const tbody = document.getElementById('deviceTable');
-            tbody.innerHTML = '';
-            
-            devices.forEach((device, index) => {
-                const row = document.createElement('tr');
-                row.className = 'device-row';
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${device.ip}</td>
-                    <td style="font-family: monospace;">${device.mac}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+                    if (data.subnetMask) document.getElementById('displaySubnet').textContent = data.subnetMask;
+                    if (data.ip) document.getElementById('displayLocalIp').textContent = data.ip;
+                    if (data.gw) document.getElementById('displayGateway').textContent = data.gw;
 
-        function showResults() {
-            document.getElementById('results').style.display = 'block';
-            if (devices.length === 0) {
-                document.getElementById('deviceTable').innerHTML = '<tr class="no-data"><td colspan="3">No se encontraron dispositivos</td></tr>';
+                    document.getElementById('scanStatusMsg').textContent = data.msg || 'Escaneando segmento local...';
+                    document.getElementById('kpiScanned').textContent = `0 / ${data.total || 254}`;
+                    break;
+
+                case 'progress':
+                    updateProgressBar(data.percent, data.current, data.total);
+                    break;
+
+                case 'device':
+                    addOrUpdateDevice(data);
+                    break;
+
+                case 'scan_complete':
+                    stopScanUI();
+                    document.getElementById('progressBarFill').style.width = '100%';
+                    document.getElementById('progressPercentText').textContent = '100%';
+                    document.getElementById('kpiTime').textContent = (data.time || 0) + 's';
+                    document.getElementById('scanStatusMsg').textContent = 
+                        `Auditoría finalizada. ${devices.length} dispositivos descubiertos en ${data.time || 0}s.`;
+                    break;
+
+                case 'error':
+                    stopScanUI();
+                    document.getElementById('scanStatusMsg').textContent = 'Error: ' + data.msg;
+                    alert('Error en el escaneo: ' + data.msg);
+                    break;
             }
         }
 
         function startTimer() {
-            timerInterval = setInterval(() => {
+            if (scanTimer) clearInterval(scanTimer);
+            scanTimer = setInterval(() => {
                 if (scanStartTime) {
                     const elapsed = Math.floor((Date.now() - scanStartTime) / 1000);
-                    document.getElementById('elapsedTime').textContent = elapsed + 's';
+                    document.getElementById('kpiTime').textContent = elapsed + 's';
                 }
             }, 1000);
         }
 
-        function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
+        function updateProgressBar(percent, current, total) {
+            const fill = document.getElementById('progressBarFill');
+            const percentLabel = document.getElementById('progressPercentText');
+            fill.style.width = (percent || 0) + '%';
+            percentLabel.textContent = (percent || 0) + '%';
+
+            document.getElementById('kpiScanned').textContent = `${current || 0} / ${total || 254}`;
+        }
+
+        function addOrUpdateDevice(device) {
+            const existingIndex = devices.findIndex(d => d.ip === device.ip);
+            if (existingIndex >= 0) {
+                devices[existingIndex] = device;
+            } else {
+                devices.push(device);
             }
+
+            // Actualizar KPIs
+            document.getElementById('kpiFound').textContent = devices.length;
+
+            const threatCount = devices.filter(d => d.riskLevel === 'CRÍTICO' || d.riskLevel === 'ALTO').length;
+            const threatElement = document.getElementById('kpiThreats');
+            threatElement.textContent = threatCount;
+            if (threatCount > 0) {
+                document.getElementById('kpiThreatsCard').classList.add('has-threats');
+            }
+
+            renderDevices();
+        }
+
+        // ==========================================
+        // Filtrado y Renderizado
+        // ==========================================
+        function setRiskFilter(filter, buttonElement) {
+            activeRiskFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            buttonElement.classList.add('active');
+            renderDevices();
+        }
+
+        function handleFilterChange() {
+            renderDevices();
+        }
+
+        function renderDevices() {
+            const tbody = document.getElementById('devicesTableBody');
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+
+            const filtered = devices.filter(dev => {
+                // Filtro por Nivel de Riesgo
+                if (activeRiskFilter !== 'ALL' && dev.riskLevel !== activeRiskFilter) {
+                    return false;
+                }
+
+                // Filtro por Texto de Búsqueda
+                if (searchTerm) {
+                    const matchIp = (dev.ip || '').toLowerCase().includes(searchTerm);
+                    const matchHost = (dev.hostname || '').toLowerCase().includes(searchTerm);
+                    const matchMac = (dev.mac || '').toLowerCase().includes(searchTerm);
+                    const matchVendor = (dev.vendor || '').toLowerCase().includes(searchTerm);
+                    const matchOs = (dev.os || '').toLowerCase().includes(searchTerm);
+                    const matchType = (dev.deviceType || '').toLowerCase().includes(searchTerm);
+                    return matchIp || matchHost || matchMac || matchVendor || matchOs || matchType;
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9">
+                            <div class="empty-state">
+                                <p>${devices.length === 0 ? 'Sin dispositivos detectados aún.' : 'No hay dispositivos que coincidan con los filtros actuales.'}</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            filtered.forEach((dev, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'device-row';
+
+                // Icono según tipo de dispositivo
+                let deviceIcon = getDeviceIcon(dev.deviceType);
+
+                // Puertos abiertos tags
+                let portsHtml = '<span style="color: var(--text-dark); font-size: 0.8rem;">Ninguno</span>';
+                if (dev.openPorts && dev.openPorts.length > 0) {
+                    portsHtml = dev.openPorts.map(p => {
+                        const isVulnPort = (p === 23 || p === 445 || p === 21 || p === 3389);
+                        return `<span class="port-tag ${isVulnPort ? 'vuln' : ''}">${p}</span>`;
+                    }).join('');
+                }
+
+                // Tooltip de riesgo
+                const riskDesc = dev.riskDescription || 'Sin advertencias detectadas';
+
+                tr.innerHTML = `
+                    <td class="mono" style="color: var(--text-dark);">${idx + 1}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            ${deviceIcon}
+                            <div>
+                                <strong style="color: #ffffff;">${escapeHtml(dev.hostname || 'Desconocido')}</strong>
+                                ${dev.ip === document.getElementById('displayGateway').textContent ? '<span class="badge" style="background: rgba(0, 212, 255, 0.15); color: #38bdf8; margin-left: 6px; font-size: 0.7rem;">GATEWAY</span>' : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="mono" style="font-weight: 600; color: var(--primary);">${dev.ip}</span>
+                        <div style="font-size: 0.75rem; color: var(--text-dark);">${dev.subnetMask ? dev.subnetMask.split(' ')[1] || '' : ''}</div>
+                    </td>
+                    <td>
+                        <div class="mono" style="font-size: 0.82rem; color: #cbd5e1;">${dev.mac || 'No disponible'}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(dev.vendor || 'Desconocido')}</div>
+                    </td>
+                    <td>
+                        <span class="badge badge-os">${escapeHtml(dev.os || 'Desconocido')}</span>
+                    </td>
+                    <td>
+                        <div class="latency-text mono">
+                            <span class="latency-dot"></span>
+                            ${dev.latencyMs !== undefined && dev.latencyMs !== null ? dev.latencyMs + ' ms' : '<1 ms'}
+                        </div>
+                    </td>
+                    <td>${portsHtml}</td>
+                    <td>
+                        <span class="badge badge-type">${escapeHtml(dev.deviceType || 'Genérico')}</span>
+                    </td>
+                    <td>
+                        <div class="tooltip-wrap">
+                            <span class="risk-badge risk-${dev.riskLevel || 'BAJO'}">
+                                ${dev.riskLevel === 'CRÍTICO' ? '●' : '●'} ${dev.riskLevel || 'BAJO'}
+                            </span>
+                            <div class="tooltip-box">
+                                <strong>Análisis de Seguridad:</strong><br>
+                                ${escapeHtml(riskDesc)}
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getDeviceIcon(type) {
+            type = (type || '').toLowerCase();
+            if (type.includes('router') || type.includes('puerta')) {
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 18h.01"/><path d="M10 18h.01"/><path d="M15 10v4"/><path d="M12 2a5 5 0 0 1 5 5v3"/></svg>`;
+            } else if (type.includes('windows')) {
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`;
+            } else if (type.includes('servidor') || type.includes('linux')) {
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>`;
+            } else if (type.includes('móvil') || type.includes('tablet')) {
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`;
+            } else if (type.includes('iot')) {
+                return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>`;
+            }
+            return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // ==========================================
+        // Exportación de Auditoría a JSON
+        // ==========================================
+        function exportAuditReport() {
+            if (devices.length === 0) {
+                alert('No hay datos disponibles para exportar.');
+                return;
+            }
+
+            const exportData = {
+                scanDate: new Date().toISOString(),
+                subnet: document.getElementById('displaySubnet').textContent,
+                gateway: document.getElementById('displayGateway').textContent,
+                totalDiscovered: devices.length,
+                devices: devices
+            };
+
+            const jsonStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `VulneraSolve_Auditoria_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>

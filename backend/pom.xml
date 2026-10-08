@@ -14,9 +14,9 @@
 
     <groupId>com.escaner</groupId>
     <artifactId>network-scanner-backend</artifactId>
-    <version>1.0.0</version>
-    <name>Network Scanner Backend</name>
-    <description>Spring Boot backend for Arduino network scanner</description>
+    <version>2.0.0</version>
+    <name>VulneraSolve Network Scanner</name>
+    <description>Auditoría de ciberseguridad y escáner de red local concurrente</description>
 
     <properties>
         <java.version>21</java.version>
@@ -35,17 +35,17 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-        <!-- jSerialComm - Serial port communication -->
-        <dependency>
-            <groupId>com.fazecast</groupId>
-            <artifactId>jSerialComm</artifactId>
-            <version>2.10.4</version>
-        </dependency>
-
         <!-- JSON processing -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Starter Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- Lombok (optional, for cleaner code) -->

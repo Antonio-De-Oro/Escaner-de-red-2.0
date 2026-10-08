@@ -1,0 +1,9 @@
+com\escaner\model\ScanMessage.class
+com\escaner\service\LocalNetworkScannerService$RiskAssessment.class
+com\escaner\service\LocalNetworkScannerService$CandidateInterface.class
+com\escaner\controller\ScanController.class
+com\escaner\service\LocalNetworkScannerService.class
+com\escaner\service\LocalNetworkScannerService$SubnetInfo.class
+com\escaner\NetworkScannerApplication.class
+com\escaner\service\LocalNetworkScannerService$PingResult.class
+com\escaner\config\WebSocketConfig.class
