@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" width="100%" height="100%">
+  <defs>
+    <!-- Filtro de resplandor sutil acorde al front-end -->
+    <filter id="cyber-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- 1. Borde exterior protector (Blanco Neón translúcido) -->
+  <path d="M 250 20 
+           C 360 80, 440 90, 480 110 
+           C 480 340, 390 490, 250 580 
+           C 110 490, 20 340, 20 110 
+           C 60 90, 140 80, 250 20 Z" 
+        fill="none" 
+        stroke="#FFFFFF" 
+        stroke-width="16" 
+        stroke-linejoin="round"
+        opacity="0.95"
+        filter="url(#cyber-glow)" />
+
+  <!-- 2. Cuerpo principal del Escudo - Faceta Izquierda (Tonalidad Blanco Plata / Sombra 3D) -->
+  <path d="M 250 75 
+           L 250 515 
+           C 150 445, 65 315, 65 145 
+           C 120 130, 185 115, 250 75 Z" 
+        fill="#94A3B8" />
+
+  <!-- 3. Cuerpo principal del Escudo - Faceta Derecha (Tonalidad Blanco Puro Brillante) -->
+  <path d="M 250 75 
+           L 250 515 
+           C 350 445, 435 315, 435 145 
+           C 380 130, 315 115, 250 75 Z" 
+        fill="#FFFFFF" />
+
+  <!-- 4. Escudo Intermedio de Contraste (Negativo / Sombra interior) -->
+  <path d="M 250 170 
+           C 310 205, 360 215, 380 235 
+           C 380 375, 320 445, 250 480 
+           C 180 445, 120 375, 120 235 
+           C 140 215, 190 205, 250 170 Z" 
+        fill="#0F172A" />
+
+  <!-- 5. Núcleo Interior - Faceta Izquierda (Blanco Platino Intermedio) -->
+  <path d="M 250 220 
+           L 250 435 
+           C 200 405, 160 340, 160 270 
+           C 190 250, 220 240, 250 220 Z" 
+        fill="#CBD5E1" />
+
+  <!-- 6. Núcleo Interior - Faceta Derecha (Blanco Hielo / Muy Claro) -->
+  <path d="M 250 220 
+           L 250 435 
+           C 300 405, 340 340, 340 270 
+           C 310 250, 280 240, 250 220 Z" 
+        fill="#F8FAFC" />
+
+  <!-- 7. Diamante Central (Blanco Puro Resplandeciente) -->
+  <polygon points="250,285 285,325 250,370 215,325" 
+           fill="#FFFFFF" />
+</svg>

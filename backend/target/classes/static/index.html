@@ -3,35 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VulneraSolve - Auditoría y Escáner de Red Local</title>
+    <title>VulneraSolve - Auditoría y escáner de red local</title>
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #0a0e17;
-            --bg-card: rgba(18, 24, 38, 0.85);
-            --bg-card-hover: rgba(26, 34, 53, 0.95);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-focus: #00d4ff;
+            /* Paleta Base SOC / Cyberpunk Moderno */
+            --bg-base: #0b0f19;
+            --bg-surface: #0f172a;
+            --bg-card: rgba(18, 26, 44, 0.85);
+            --bg-card-hover: rgba(26, 38, 64, 0.95);
+            --border-color: rgba(56, 189, 248, 0.15);
+            --border-glow: rgba(0, 212, 255, 0.4);
             
+            /* Acentos Neón / Azul Eléctrico */
             --primary: #00d4ff;
             --primary-glow: rgba(0, 212, 255, 0.35);
+            --primary-dark: #0284c7;
             --secondary: #6366f1;
+            --secondary-glow: rgba(99, 102, 241, 0.3);
             
-            --text-main: #f1f5f9;
+            /* Tipografía */
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --text-dark: #64748b;
             
-            /* Niveles de Riesgo */
+            /* Niveles de Riesgo y Severidad */
             --risk-critical: #ef4444;
-            --risk-critical-bg: rgba(239, 68, 68, 0.15);
+            --risk-critical-glow: rgba(239, 68, 68, 0.35);
+            --risk-critical-bg: rgba(239, 68, 68, 0.14);
+            
             --risk-high: #f97316;
-            --risk-high-bg: rgba(249, 115, 22, 0.15);
+            --risk-high-glow: rgba(249, 115, 22, 0.35);
+            --risk-high-bg: rgba(249, 115, 22, 0.14);
+            
             --risk-medium: #eab308;
-            --risk-medium-bg: rgba(234, 179, 8, 0.15);
+            --risk-medium-glow: rgba(234, 179, 8, 0.35);
+            --risk-medium-bg: rgba(234, 179, 8, 0.14);
+            
             --risk-low: #10b981;
-            --risk-low-bg: rgba(16, 185, 129, 0.15);
+            --risk-low-glow: rgba(16, 185, 129, 0.35);
+            --risk-low-bg: rgba(16, 185, 129, 0.14);
         }
 
         * {
@@ -43,9 +57,14 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-base);
+            /* Red cibernética sutil con degradados radiales dinámicos */
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(0, 212, 255, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.06) 0%, transparent 40%);
+                radial-gradient(circle at 12% 18%, rgba(0, 212, 255, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 88% 82%, rgba(99, 102, 241, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.03) 0%, transparent 60%),
+                linear-gradient(to right, rgba(56, 189, 248, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(56, 189, 248, 0.035) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 42px 42px, 42px 42px;
             color: var(--text-main);
             min-height: 100vh;
             padding: 24px;
@@ -56,7 +75,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Top Bar & Connection Status */
+        /* Top Status Bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -65,40 +84,65 @@
             margin: 0 auto 20px auto;
         }
 
+        .engine-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .engine-label .pulse-indicator {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulseDot 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
+
         .ws-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 14px;
+            padding: 6px 16px;
             border-radius: 999px;
             font-size: 0.82rem;
             font-weight: 600;
             border: 1px solid var(--border-color);
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(8px);
-            transition: all 0.3s;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .ws-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #ef4444;
-            box-shadow: 0 0 8px #ef4444;
+            background: var(--risk-critical);
+            box-shadow: 0 0 8px var(--risk-critical);
         }
 
         .ws-badge.connected .ws-dot {
-            background: #10b981;
-            box-shadow: 0 0 10px #10b981;
+            background: var(--risk-low);
+            box-shadow: 0 0 10px var(--risk-low);
         }
 
         .ws-badge.connected {
-            border-color: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.35);
             color: #6ee7b7;
         }
 
         .ws-badge.disconnected {
-            border-color: rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.35);
             color: #fca5a5;
         }
 
@@ -108,16 +152,16 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 22px;
         }
 
-        /* Header Card */
+        /* Header Card con Glassmorphism */
         .header-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            padding: 28px 36px;
-            backdrop-filter: blur(12px);
+            padding: 26px 36px;
+            backdrop-filter: blur(14px);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -125,6 +169,7 @@
             gap: 20px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
         }
 
         .header-card::before {
@@ -134,7 +179,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+            background: linear-gradient(90deg, transparent 5%, var(--primary) 30%, var(--secondary) 70%, transparent 95%);
         }
 
         .brand-section {
@@ -143,25 +188,82 @@
             gap: 20px;
         }
 
+        .logo-wrapper {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(11, 15, 25, 0.95) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 18px;
+            padding: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 212, 255, 0.15), inset 0 0 14px rgba(0, 212, 255, 0.06);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .logo-wrapper:hover {
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 212, 255, 0.25), inset 0 0 16px rgba(0, 212, 255, 0.1);
+        }
+
         .logo-img {
-            width: 70px;
-            height: auto;
-            filter: drop-shadow(0 0 12px var(--primary-glow));
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.35));
+            transition: filter 0.3s ease;
+        }
+
+        .logo-wrapper:hover .logo-img {
+            filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.55));
         }
 
         .brand-titles h1 {
-            font-size: 2rem;
+            font-size: 2.1rem;
             font-weight: 800;
             letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff 40%, var(--primary) 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Animación en degradado azul y blanco que fluye hacia la derecha sobre SOLVE */
+        .solve-gradient {
+            background: linear-gradient(
+                90deg, 
+                #00d4ff 0%, 
+                #38bdf8 20%, 
+                #ffffff 45%, 
+                #ffffff 55%, 
+                #38bdf8 80%, 
+                #00d4ff 100%
+            );
+            background-size: 200% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: solvePathFlow 4.5s linear infinite;
+            display: inline-block;
+            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.4));
+        }
+
+        @keyframes solvePathFlow {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
         }
 
         .brand-titles p {
             font-size: 0.9rem;
             color: var(--text-muted);
             margin-top: 4px;
+            font-weight: 500;
         }
 
         .network-chips {
@@ -171,7 +273,7 @@
         }
 
         .chip {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.035);
             border: 1px solid var(--border-color);
             padding: 8px 16px;
             border-radius: 12px;
@@ -180,6 +282,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            backdrop-filter: blur(8px);
+            transition: border-color 0.25s;
+        }
+
+        .chip:hover {
+            border-color: rgba(56, 189, 248, 0.35);
         }
 
         .chip strong {
@@ -204,13 +312,13 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 14px 28px;
-            font-size: 1rem;
+            padding: 13px 26px;
+            font-size: 0.95rem;
             font-weight: 700;
-            border-radius: 14px;
+            border-radius: 13px;
             border: none;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             font-family: inherit;
         }
 
@@ -218,11 +326,16 @@
             background: linear-gradient(135deg, #00d4ff 0%, #0284c7 100%);
             color: #04111d;
             box-shadow: 0 4px 20px var(--primary-glow);
+            animation: btnPulse 3.5s infinite ease-in-out;
         }
 
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.55);
+            box-shadow: 0 6px 28px rgba(0, 212, 255, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
         }
 
         .btn-primary:disabled {
@@ -231,23 +344,40 @@
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
+            animation: none;
+        }
+
+        @keyframes btnPulse {
+            0%, 100% {
+                box-shadow: 0 4px 18px rgba(0, 212, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 6px 30px rgba(0, 212, 255, 0.65);
+            }
         }
 
         .btn-outline {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-color);
             color: var(--text-main);
+            backdrop-filter: blur(8px);
         }
 
         .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(56, 189, 248, 0.1);
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.15);
+        }
+
+        .btn-outline:active {
+            transform: scale(0.98);
         }
 
         .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(4, 17, 29, 0.2);
+            width: 17px;
+            height: 17px;
+            border: 2px solid rgba(4, 17, 29, 0.25);
             border-top-color: #04111d;
             border-radius: 50%;
             animation: spin 0.75s linear infinite;
@@ -258,7 +388,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* KPI Grid Cards */
+        /* Tarjetas KPI con Elevación y Cyber-Glow */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -268,26 +398,48 @@
         .kpi-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 22px;
+            border-radius: 18px;
+            padding: 24px;
             position: relative;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
+            backdrop-filter: blur(14px);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .kpi-card:hover {
-            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+            border-color: rgba(56, 189, 248, 0.45);
             background: var(--bg-card-hover);
+            box-shadow: 0 8px 25px rgba(0, 180, 255, 0.15);
         }
 
         .kpi-card.alert-card {
-            border-color: rgba(239, 68, 68, 0.3);
-            background: rgba(239, 68, 68, 0.04);
+            border-color: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.035);
+        }
+
+        .kpi-card.alert-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(239, 68, 68, 0.7);
+            background: rgba(239, 68, 68, 0.08);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.35);
         }
 
         .kpi-card.alert-card.has-threats {
             border-color: rgba(239, 68, 68, 0.8);
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.25);
+            animation: alertCardPulse 2.5s infinite ease-in-out;
+        }
+
+        .kpi-card.alert-card.has-threats:hover {
+            border-color: rgba(239, 68, 68, 1);
+            box-shadow: 0 8px 28px rgba(239, 68, 68, 0.5);
+        }
+
+        @keyframes alertCardPulse {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.6); }
+            50% { border-color: rgba(239, 68, 68, 1); box-shadow: 0 0 30px rgba(239, 68, 68, 0.35); }
         }
 
         .kpi-header {
@@ -298,22 +450,28 @@
         }
 
         .kpi-title {
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.82rem;
+            font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
 
         .kpi-icon {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover .kpi-icon {
+            transform: scale(1.08);
+            background: rgba(0, 212, 255, 0.12);
         }
 
         .kpi-card.alert-card .kpi-icon {
@@ -332,16 +490,18 @@
             font-size: 0.8rem;
             color: var(--text-dark);
             margin-top: 8px;
+            font-weight: 500;
         }
 
-        /* Barra de Progreso */
+        /* Barra de Progreso con Animación Shimmer */
         .progress-box {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 20px 24px;
             display: none;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .progress-meta {
@@ -372,10 +532,21 @@
         .progress-bar-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #00d4ff, #6366f1);
+            background: linear-gradient(90deg, #00d4ff 0%, #38bdf8 25%, #818cf8 50%, #38bdf8 75%, #00d4ff 100%);
+            background-size: 200% 100%;
             border-radius: 999px;
             transition: width 0.3s ease-out;
-            box-shadow: 0 0 12px var(--primary-glow);
+            box-shadow: 0 0 14px var(--primary-glow);
+        }
+
+        /* Efecto de barrido de neón en curso */
+        .progress-box.scanning .progress-bar-fill {
+            animation: shimmer 2s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         /* Toolbar de Filtros y Búsqueda */
@@ -383,12 +554,14 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 16px 20px;
+            padding: 16px 22px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
         .search-box {
@@ -413,7 +586,7 @@
         .search-input:focus {
             border-color: var(--primary);
             background: rgba(255, 255, 255, 0.07);
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
         }
 
         .search-icon {
@@ -440,13 +613,14 @@
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             font-family: inherit;
         }
 
         .filter-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(56, 189, 248, 0.1);
             color: var(--text-main);
+            border-color: rgba(56, 189, 248, 0.35);
         }
 
         .filter-btn.active {
@@ -462,7 +636,8 @@
             border: 1px solid var(--border-color);
             border-radius: 20px;
             overflow: hidden;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
         }
 
         .table-responsive {
@@ -478,7 +653,7 @@
         }
 
         thead {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.025);
             border-bottom: 1px solid var(--border-color);
         }
 
@@ -499,18 +674,18 @@
         }
 
         tr.device-row {
-            transition: background 0.2s;
-            animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s;
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         tr.device-row:hover {
-            background: var(--bg-card-hover);
+            background-color: rgba(14, 165, 233, 0.08) !important;
         }
 
-        @keyframes slideIn {
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(-8px);
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
@@ -518,7 +693,7 @@
             }
         }
 
-        /* Badges & Pills */
+        /* Badges de SO y Categoría */
         .badge {
             display: inline-flex;
             align-items: center;
@@ -542,7 +717,7 @@
             border: 1px solid rgba(99, 102, 241, 0.3);
         }
 
-        /* Badges de Riesgo */
+        /* Badges de Riesgo Interactivos */
         .risk-badge {
             padding: 5px 12px;
             border-radius: 999px;
@@ -552,20 +727,34 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            cursor: help;
+            cursor: pointer;
             position: relative;
+            user-select: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .risk-badge:hover {
+            transform: translateY(-1px);
         }
 
         .risk-BAJO {
             background: var(--risk-low-bg);
             color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+        }
+        .risk-BAJO:hover {
+            box-shadow: 0 0 12px var(--risk-low-glow);
+            border-color: rgba(16, 185, 129, 0.7);
         }
 
         .risk-MEDIO {
             background: var(--risk-medium-bg);
             color: #facc15;
-            border: 1px solid rgba(234, 179, 8, 0.3);
+            border: 1px solid rgba(234, 179, 8, 0.35);
+        }
+        .risk-MEDIO:hover {
+            box-shadow: 0 0 14px var(--risk-medium-glow);
+            border-color: rgba(234, 179, 8, 0.7);
         }
 
         .risk-ALTO {
@@ -573,12 +762,20 @@
             color: #fb923c;
             border: 1px solid rgba(249, 115, 22, 0.4);
         }
+        .risk-ALTO:hover {
+            box-shadow: 0 0 16px var(--risk-high-glow);
+            border-color: rgba(249, 115, 22, 0.8);
+        }
 
         .risk-CRÍTICO {
             background: var(--risk-critical-bg);
             color: #f87171;
             border: 1px solid rgba(239, 68, 68, 0.6);
             animation: pulseCritical 2s infinite;
+        }
+        .risk-CRÍTICO:hover {
+            box-shadow: 0 0 20px var(--risk-critical-glow);
+            border-color: rgba(239, 68, 68, 1);
         }
 
         @keyframes pulseCritical {
@@ -590,7 +787,7 @@
             }
         }
 
-        /* Puertos */
+        /* Tags de Puertos */
         .port-tag {
             display: inline-block;
             background: rgba(0, 212, 255, 0.1);
@@ -601,45 +798,24 @@
             font-size: 0.72rem;
             font-family: 'JetBrains Mono', monospace;
             margin: 2px;
+            transition: all 0.2s;
+        }
+
+        .port-tag:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 255, 0.5);
+            transform: translateY(-1px);
         }
 
         .port-tag.vuln {
             background: rgba(239, 68, 68, 0.2);
             color: #f87171;
-            border-color: rgba(239, 68, 68, 0.4);
+            border-color: rgba(239, 68, 68, 0.45);
         }
 
-        /* Tooltip Nativo Limpio */
-        .tooltip-wrap {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip-wrap .tooltip-box {
-            visibility: hidden;
-            opacity: 0;
-            width: 250px;
-            background: #0f172a;
-            color: #e2e8f0;
-            text-align: left;
-            border-radius: 10px;
-            padding: 10px 14px;
-            position: absolute;
-            z-index: 50;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            font-size: 0.78rem;
-            line-height: 1.4;
-            transition: opacity 0.2s, visibility 0.2s;
-            pointer-events: none;
-        }
-
-        .tooltip-wrap:hover .tooltip-box {
-            visibility: visible;
-            opacity: 1;
+        .port-tag.vuln:hover {
+            background: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
         }
 
         /* Latencia */
@@ -656,6 +832,7 @@
             height: 6px;
             border-radius: 50%;
             background: #10b981;
+            box-shadow: 0 0 6px #10b981;
         }
 
         /* Estado Vacío */
@@ -669,6 +846,181 @@
             margin-bottom: 16px;
             color: var(--text-dark);
             opacity: 0.5;
+        }
+
+        /* ==========================================================
+           2. VENTANA FLOTANTE DE VULNERABILIDADES (POPOVER CARD)
+           ========================================================== */
+        .vuln-popover {
+            position: fixed;
+            z-index: 9999;
+            width: 390px;
+            max-width: 92vw;
+            background: #0f172a;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 16px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 212, 255, 0.1);
+            backdrop-filter: blur(20px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px) scale(0.97);
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                        visibility 0.2s;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .vuln-popover.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        /* Colores dinámicos del Popover según Severidad */
+        .vuln-popover.theme-CRÍTICO {
+            border-color: rgba(239, 68, 68, 0.65);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(239, 68, 68, 0.25);
+        }
+        .vuln-popover.theme-ALTO {
+            border-color: rgba(249, 115, 22, 0.65);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(249, 115, 22, 0.25);
+        }
+        .vuln-popover.theme-MEDIO {
+            border-color: rgba(234, 179, 8, 0.65);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(234, 179, 8, 0.25);
+        }
+        .vuln-popover.theme-BAJO {
+            border-color: rgba(16, 185, 129, 0.65);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.25);
+        }
+
+        .popover-header {
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.025);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .popover-title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .popover-icon-box {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .popover-host-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 175px;
+        }
+
+        .popover-host-ip {
+            font-size: 0.78rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .popover-cvss-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .popover-body {
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .popover-section-title {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .popover-ports-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .popover-port-item {
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 9px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+        }
+
+        .popover-port-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .popover-port-num {
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+        }
+
+        .popover-port-desc {
+            color: #cbd5e1;
+            font-size: 0.76rem;
+            line-height: 1.35;
+        }
+
+        .popover-mitigation-box {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 9px;
+            padding: 10px 12px;
+            font-size: 0.78rem;
+            color: #e2e8f0;
+            line-height: 1.45;
+        }
+
+        .popover-footer {
+            padding: 10px 18px;
+            background: rgba(0, 0, 0, 0.25);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            color: var(--text-dark);
         }
 
         /* Footer */
@@ -688,10 +1040,13 @@
         @media (max-width: 768px) {
             body { padding: 12px; }
             .header-card { padding: 20px; }
-            .brand-titles h1 { font-size: 1.6rem; }
+            .brand-section { gap: 14px; }
+            .logo-wrapper { width: 56px; height: 56px; border-radius: 14px; }
+            .brand-titles h1 { font-size: 1.5rem; }
             .action-bar { flex-direction: column; align-items: stretch; }
             .btn { width: 100%; justify-content: center; }
             .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .vuln-popover { width: calc(100vw - 32px); left: 16px !important; }
         }
     </style>
 </head>
@@ -699,8 +1054,9 @@
 
     <!-- Barra Superior -->
     <div class="top-bar">
-        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
-            MOTOR DE AUDITORÍA NATIVO (HOST NIC)
+        <div class="engine-label">
+            <span class="pulse-indicator"></span>
+            SERVICIO DE AUDITORÍA DE RED
         </div>
         <div class="ws-badge disconnected" id="wsBadge">
             <span class="ws-dot"></span>
@@ -713,17 +1069,19 @@
         <!-- Tarjeta Principal de Cabecera -->
         <header class="header-card">
             <div class="brand-section">
-                <img src="logo.png" alt="VULNERASOLVE" class="logo-img">
+                <div class="logo-wrapper">
+                    <img src="logo.svg" alt="VULNERASOLVE Emblem" class="logo-img">
+                </div>
                 <div class="brand-titles">
-                    <h1>VULNERASOLVE</h1>
-                    <p>Auditoría de Ciberseguridad & Topología de Red Concurrente</p>
+                    <h1>VULNERA<span class="solve-gradient">SOLVE</span></h1>
+                    <p>Soluciones eficaces a problemas sofisticados</p>
                 </div>
             </div>
 
             <div class="network-chips">
                 <div class="chip">
                     <span>Subred:</span>
-                    <strong id="displaySubnet" class="mono">Detectando...</strong>
+                    <strong id="displaySubnet" class="mono">-</strong>
                 </div>
                 <div class="chip">
                     <span>Host IP:</span>
@@ -746,7 +1104,7 @@
                         <path d="M12 6a6 6 0 1 0 6 6 6 6 0 0 0-6-6z"/>
                         <line x1="12" y1="12" x2="16" y2="8"/>
                     </svg>
-                    <span id="btnText">Iniciar Auditoría de Red</span>
+                    <span id="btnText">Iniciar auditoría de red</span>
                 </button>
 
                 <button class="btn btn-outline" onclick="exportAuditReport()">
@@ -764,11 +1122,11 @@
             </div>
         </div>
 
-        <!-- Tarjetas de Métricas KPI -->
+        <!-- Tarjetas de Métricas KPI con Micro-Animaciones -->
         <div class="kpi-grid">
             <div class="kpi-card">
                 <div class="kpi-header">
-                    <span class="kpi-title">IPs Auditadas</span>
+                    <span class="kpi-title">IPs auditadas</span>
                     <div class="kpi-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                     </div>
@@ -779,7 +1137,7 @@
 
             <div class="kpi-card">
                 <div class="kpi-header">
-                    <span class="kpi-title">Hosts Descubiertos</span>
+                    <span class="kpi-title">Hosts descubiertos</span>
                     <div class="kpi-icon" style="color: #38bdf8;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
                     </div>
@@ -790,7 +1148,7 @@
 
             <div class="kpi-card alert-card" id="kpiThreatsCard">
                 <div class="kpi-header">
-                    <span class="kpi-title">Riesgo Crítico / Alto</span>
+                    <span class="kpi-title">Riesgo crítico</span>
                     <div class="kpi-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
@@ -801,7 +1159,7 @@
 
             <div class="kpi-card">
                 <div class="kpi-header">
-                    <span class="kpi-title">Tiempo de Auditoría</span>
+                    <span class="kpi-title">Tiempo de auditoría</span>
                     <div class="kpi-icon" style="color: #a855f7;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     </div>
@@ -811,7 +1169,7 @@
             </div>
         </div>
 
-        <!-- Barra de Progreso Dinámica -->
+        <!-- Barra de Progreso Dinámica Shimmer -->
         <div class="progress-box" id="progressBox">
             <div class="progress-meta">
                 <span class="progress-status" id="progressStatusText">
@@ -832,7 +1190,7 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" class="search-input" id="searchInput" placeholder="Filtrar por IP, Hostname, MAC, Fabricante o SO..." oninput="handleFilterChange()">
+                <input type="text" class="search-input" id="searchInput" placeholder="Filtrar por IP, hostname, MAC, fabricante o SO..." oninput="handleFilterChange()">
             </div>
 
             <div class="filter-chips-group">
@@ -840,7 +1198,7 @@
                 <button class="filter-btn" data-filter="CRÍTICO" onclick="setRiskFilter('CRÍTICO', this)">Crítico</button>
                 <button class="filter-btn" data-filter="ALTO" onclick="setRiskFilter('ALTO', this)">Alto</button>
                 <button class="filter-btn" data-filter="MEDIO" onclick="setRiskFilter('MEDIO', this)">Medio</button>
-                <button class="filter-btn" data-filter="BAJO" onclick="setRiskFilter('BAJO', this)">Bajo / Seguro</button>
+                <button class="filter-btn" data-filter="BAJO" onclick="setRiskFilter('BAJO', this)">Seguro</button>
             </div>
         </div>
 
@@ -851,19 +1209,18 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Dispositivo / Hostname</th>
-                            <th>Dirección IP / Máscara</th>
-                            <th>MAC / Fabricante</th>
-                            <th>Sistema Operativo</th>
+                            <th>Dispositivo / hostname</th>
+                            <th>Dirección IP / máscara</th>
+                            <th>MAC / fabricante</th>
+                            <th>Sistema operativo</th>
                             <th>Latencia</th>
-                            <th>Puertos Abiertos</th>
                             <th>Categoría</th>
-                            <th>Nivel de Riesgo</th>
+                            <th>Nivel de riesgo</th>
                         </tr>
                     </thead>
                     <tbody id="devicesTableBody">
                         <tr id="emptyRow">
-                            <td colspan="9">
+                            <td colspan="8">
                                 <div class="empty-state">
                                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                         <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
@@ -871,7 +1228,7 @@
                                         <line x1="6" y1="6" x2="6.01" y2="6"/>
                                         <line x1="6" y1="18" x2="6.01" y2="18"/>
                                     </svg>
-                                    <p>No hay dispositivos auditados aún. Presiona "Iniciar Auditoría de Red".</p>
+                                    <p>No hay dispositivos auditados aún. Presiona "Iniciar auditoría de red".</p>
                                 </div>
                             </td>
                         </tr>
@@ -882,10 +1239,62 @@
 
         <!-- Footer -->
         <footer>
-            <strong>VULNERASOLVE SECURITY SUITE &copy; 2026</strong><br>
+            <strong>VULNERASOLVE &copy; 2026</strong><br>
             Auditoría de superficie de ataque en red de área local (LAN) &bull; Spring Boot + WebSocket
         </footer>
 
+    </div>
+
+    <!-- ==========================================================
+         VENTANA FLOTANTE DE VULNERABILIDADES (POPOVER CARD)
+         ========================================================== -->
+    <div id="vulnPopover" class="vuln-popover" onmouseenter="cancelHidePopover()" onmouseleave="scheduleHidePopover()">
+        <div class="popover-header">
+            <div class="popover-title-row">
+                <div class="popover-icon-box" id="popoverIconBox">
+                    <!-- Icono dinámico según severidad -->
+                </div>
+                <div>
+                    <div class="popover-host-name" id="popoverHost">HOSTNAME</div>
+                    <div class="popover-host-ip mono" id="popoverIp">192.168.1.1</div>
+                </div>
+            </div>
+            <div class="popover-cvss-badge" id="popoverCvssBadge">CRÍTICO</div>
+        </div>
+
+        <div class="popover-body">
+            <div class="popover-section">
+                <div class="popover-section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                        <line x1="6" y1="6" x2="6.01" y2="6"/>
+                        <line x1="6" y1="18" x2="6.01" y2="18"/>
+                    </svg>
+                    Puertos y servicios expuestos
+                </div>
+                <div class="popover-ports-list" id="popoverPortsList">
+                    <!-- Lista de puertos analizados dinámicamente -->
+                </div>
+            </div>
+
+            <div class="popover-section">
+                <div class="popover-section-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    Recomendación de mitigación
+                </div>
+                <div class="popover-mitigation-box" id="popoverMitigation">
+                    <!-- Recomendación técnica generada -->
+                </div>
+            </div>
+        </div>
+
+        <div class="popover-footer">
+            <span id="popoverTimestamp">Detectado: -</span>
+            <span class="mono" style="color: var(--primary);">VulneraSolve</span>
+        </div>
     </div>
 
     <!-- SockJS y STOMP -->
@@ -898,10 +1307,68 @@
         let activeRiskFilter = 'ALL';
         let scanTimer = null;
         let scanStartTime = null;
+        let popoverHideTimeout = null;
+
+        // Base de conocimiento de puertos y análisis de amenazas
+        const PORT_KNOWLEDGE_BASE = {
+            21: {
+                name: 'FTP (File Transfer Protocol)',
+                severity: 'ALTO',
+                risk: 'Transmisión de credenciales en texto plano. Vulnerable a interceptación de tráfico (Sniffing) y ataques de fuerza bruta.'
+            },
+            22: {
+                name: 'SSH (Secure Shell)',
+                severity: 'BAJO',
+                risk: 'Canal administrativo seguro y cifrado. Verificar deshabilitación del usuario root y uso de llaves criptográficas.'
+            },
+            23: {
+                name: 'Telnet (Teletype Network)',
+                severity: 'CRÍTICO',
+                risk: 'Protocolo obsoleto sin cifrado. Contraseñas y comandos viajan en texto claro, permitiendo secuestro de sesión inmediato.'
+            },
+            53: {
+                name: 'DNS (Domain Name System)',
+                severity: 'BAJO',
+                risk: 'Resolución de nombres. Validar que no actúe como Open Resolver vulnerable a ataques de amplificación DDoS o DNS Poisoning.'
+            },
+            80: {
+                name: 'HTTP (Hypertext Transfer Protocol)',
+                severity: 'MEDIO',
+                risk: 'Servicio web sin cifrado SSL/TLS. Datos sensibles y cookies expuestos a ataques Man-in-the-Middle (MitM).'
+            },
+            443: {
+                name: 'HTTPS (HTTP Seguro)',
+                severity: 'BAJO',
+                risk: 'Tráfico web cifrado mediante TLS. Recomendado verificar certificados SSL vigentes y suites de cifrado modernas.'
+            },
+            445: {
+                name: 'SMB (Server Message Block)',
+                severity: 'CRÍTICO',
+                risk: 'Exposición crítica a vectores de explotación lateral, ransomware y vulnerabilidades remotas como EternalBlue (MS17-010).'
+            },
+            3389: {
+                name: 'RDP (Remote Desktop Protocol)',
+                severity: 'ALTO',
+                risk: 'Interfaz gráfica de escritorio remoto expuesta en red local. Objetivo primario de ataques de fuerza bruta y exploits como BlueKeep.'
+            },
+            8080: {
+                name: 'HTTP-Proxy / Alt',
+                severity: 'MEDIO',
+                risk: 'Servicio web o consola de gestión alternativa en claro. Tráfico no encriptado susceptible a intercepción.'
+            }
+        };
 
         window.onload = function() {
             connectWebSocket();
             fetchInitialStatus();
+
+            // Cerrar popover al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                const popover = document.getElementById('vulnPopover');
+                if (!popover.contains(e.target) && !e.target.closest('.risk-badge')) {
+                    hidePopoverImmediate();
+                }
+            });
         };
 
         function fetchInitialStatus() {
@@ -919,7 +1386,7 @@
         function connectWebSocket() {
             const socket = new SockJS('/ws');
             stompClient = Stomp.over(socket);
-            stompClient.debug = null; // Silenciar logs extensos de STOMP en consola
+            stompClient.debug = null;
 
             stompClient.connect({}, function(frame) {
                 console.log('[WS] Conectado al broker WebSocket');
@@ -946,25 +1413,26 @@
         }
 
         // ==========================================
-        // Disparar Escaneo
+        // Control de Escaneo
         // ==========================================
         function startScan() {
             const startBtn = document.getElementById('startBtn');
             const spinner = document.getElementById('btnSpinner');
             const radarIcon = document.getElementById('radarIcon');
             const btnText = document.getElementById('btnText');
+            const progressBox = document.getElementById('progressBox');
 
             startBtn.disabled = true;
             spinner.style.display = 'inline-block';
             radarIcon.style.display = 'none';
             btnText.textContent = 'Auditando red...';
 
-            // Reiniciar estado
             devices = [];
             renderDevices();
             resetCounters();
 
-            document.getElementById('progressBox').style.display = 'block';
+            progressBox.style.display = 'block';
+            progressBox.classList.add('scanning'); // Activar animación Shimmer
             document.getElementById('scanStatusMsg').textContent = 'Solicitando inicio de escaneo a la interfaz...';
 
             fetch('/api/scan', { method: 'POST' })
@@ -989,11 +1457,13 @@
             const spinner = document.getElementById('btnSpinner');
             const radarIcon = document.getElementById('radarIcon');
             const btnText = document.getElementById('btnText');
+            const progressBox = document.getElementById('progressBox');
 
             startBtn.disabled = false;
             spinner.style.display = 'none';
             radarIcon.style.display = 'inline-block';
-            btnText.textContent = 'Iniciar Auditoría de Red';
+            btnText.textContent = 'Iniciar auditoría de red';
+            progressBox.classList.remove('scanning');
 
             if (scanTimer) {
                 clearInterval(scanTimer);
@@ -1002,6 +1472,9 @@
         }
 
         function resetCounters() {
+            document.getElementById('displaySubnet').textContent = '-';
+            document.getElementById('displayLocalIp').textContent = '-';
+            document.getElementById('displayGateway').textContent = '-';
             document.getElementById('kpiScanned').textContent = '0 / 254';
             document.getElementById('kpiFound').textContent = '0';
             document.getElementById('kpiThreats').textContent = '0';
@@ -1015,8 +1488,6 @@
         // Procesamiento de Mensajes WebSocket
         // ==========================================
         function handleWebSocketMessage(data) {
-            console.log('[SCAN MSG]', data);
-
             switch (data.type) {
                 case 'scan_start':
                     scanStartTime = Date.now();
@@ -1035,6 +1506,9 @@
                     break;
 
                 case 'device':
+                    data.detectedAt = new Date().toLocaleTimeString('es-ES', { 
+                        hour: '2-digit', minute: '2-digit', second: '2-digit' 
+                    });
                     addOrUpdateDevice(data);
                     break;
 
@@ -1077,15 +1551,14 @@
         function addOrUpdateDevice(device) {
             const existingIndex = devices.findIndex(d => d.ip === device.ip);
             if (existingIndex >= 0) {
-                devices[existingIndex] = device;
+                devices[existingIndex] = { ...devices[existingIndex], ...device };
             } else {
                 devices.push(device);
             }
 
-            // Actualizar KPIs
             document.getElementById('kpiFound').textContent = devices.length;
 
-            const threatCount = devices.filter(d => d.riskLevel === 'CRÍTICO' || d.riskLevel === 'ALTO').length;
+            const threatCount = devices.filter(d => d.riskLevel === 'CRÍTICO').length;
             const threatElement = document.getElementById('kpiThreats');
             threatElement.textContent = threatCount;
             if (threatCount > 0) {
@@ -1114,12 +1587,10 @@
             const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
 
             const filtered = devices.filter(dev => {
-                // Filtro por Nivel de Riesgo
                 if (activeRiskFilter !== 'ALL' && dev.riskLevel !== activeRiskFilter) {
                     return false;
                 }
 
-                // Filtro por Texto de Búsqueda
                 if (searchTerm) {
                     const matchIp = (dev.ip || '').toLowerCase().includes(searchTerm);
                     const matchHost = (dev.hostname || '').toLowerCase().includes(searchTerm);
@@ -1136,7 +1607,7 @@
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="9">
+                        <td colspan="8">
                             <div class="empty-state">
                                 <p>${devices.length === 0 ? 'Sin dispositivos detectados aún.' : 'No hay dispositivos que coincidan con los filtros actuales.'}</p>
                             </div>
@@ -1151,20 +1622,10 @@
                 const tr = document.createElement('tr');
                 tr.className = 'device-row';
 
-                // Icono según tipo de dispositivo
                 let deviceIcon = getDeviceIcon(dev.deviceType);
 
-                // Puertos abiertos tags
-                let portsHtml = '<span style="color: var(--text-dark); font-size: 0.8rem;">Ninguno</span>';
-                if (dev.openPorts && dev.openPorts.length > 0) {
-                    portsHtml = dev.openPorts.map(p => {
-                        const isVulnPort = (p === 23 || p === 445 || p === 21 || p === 3389);
-                        return `<span class="port-tag ${isVulnPort ? 'vuln' : ''}">${p}</span>`;
-                    }).join('');
-                }
-
-                // Tooltip de riesgo
-                const riskDesc = dev.riskDescription || 'Sin advertencias detectadas';
+                // Índice real en el arreglo global devices
+                const realDeviceIndex = devices.findIndex(d => d.ip === dev.ip);
 
                 tr.innerHTML = `
                     <td class="mono" style="color: var(--text-dark);">${idx + 1}</td>
@@ -1194,20 +1655,17 @@
                             ${dev.latencyMs !== undefined && dev.latencyMs !== null ? dev.latencyMs + ' ms' : '<1 ms'}
                         </div>
                     </td>
-                    <td>${portsHtml}</td>
                     <td>
                         <span class="badge badge-type">${escapeHtml(dev.deviceType || 'Genérico')}</span>
                     </td>
                     <td>
-                        <div class="tooltip-wrap">
-                            <span class="risk-badge risk-${dev.riskLevel || 'BAJO'}">
-                                ${dev.riskLevel === 'CRÍTICO' ? '●' : '●'} ${dev.riskLevel || 'BAJO'}
-                            </span>
-                            <div class="tooltip-box">
-                                <strong>Análisis de Seguridad:</strong><br>
-                                ${escapeHtml(riskDesc)}
-                            </div>
-                        </div>
+                        <span class="risk-badge risk-${dev.riskLevel || 'BAJO'}"
+                              data-device-index="${realDeviceIndex}"
+                              onmouseenter="handleRiskBadgeEnter(this, ${realDeviceIndex})"
+                              onmouseleave="scheduleHidePopover()"
+                              onclick="handleRiskBadgeClick(this, ${realDeviceIndex}, event)">
+                            ${dev.riskLevel === 'CRÍTICO' ? '●' : '●'} ${dev.riskLevel || 'BAJO'}
+                        </span>
                     </td>
                 `;
 
@@ -1215,6 +1673,189 @@
             });
         }
 
+        // ==========================================================
+        // GESTIÓN DEL POPOVER INTELIGENTE DE VULNERABILIDADES
+        // ==========================================================
+        function handleRiskBadgeEnter(badgeElement, deviceIndex) {
+            cancelHidePopover();
+            showVulnPopover(badgeElement, deviceIndex);
+        }
+
+        function handleRiskBadgeClick(badgeElement, deviceIndex, event) {
+            event.stopPropagation();
+            cancelHidePopover();
+            showVulnPopover(badgeElement, deviceIndex);
+        }
+
+        function showVulnPopover(badgeElement, deviceIndex) {
+            const device = devices[deviceIndex];
+            if (!device) return;
+
+            const popover = document.getElementById('vulnPopover');
+            
+            // 1. Limpiar temas y aplicar el del nivel de riesgo
+            popover.className = `vuln-popover theme-${device.riskLevel || 'BAJO'}`;
+
+            // 2. Encabezado
+            document.getElementById('popoverHost').textContent = device.hostname || 'Host Desconocido';
+            document.getElementById('popoverIp').textContent = device.ip;
+
+            const cvssBadge = document.getElementById('popoverCvssBadge');
+            const iconBox = document.getElementById('popoverIconBox');
+            
+            if (device.riskLevel === 'CRÍTICO') {
+                cvssBadge.textContent = 'CRÍTICO';
+                cvssBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+                cvssBadge.style.color = '#f87171';
+                cvssBadge.style.border = '1px solid rgba(239, 68, 68, 0.5)';
+                iconBox.style.background = 'rgba(239, 68, 68, 0.2)';
+                iconBox.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+            } else if (device.riskLevel === 'ALTO') {
+                cvssBadge.textContent = 'ALTO';
+                cvssBadge.style.background = 'rgba(249, 115, 22, 0.2)';
+                cvssBadge.style.color = '#fb923c';
+                cvssBadge.style.border = '1px solid rgba(249, 115, 22, 0.5)';
+                iconBox.style.background = 'rgba(249, 115, 22, 0.2)';
+                iconBox.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+            } else if (device.riskLevel === 'MEDIO') {
+                cvssBadge.textContent = 'MEDIO';
+                cvssBadge.style.background = 'rgba(234, 179, 8, 0.2)';
+                cvssBadge.style.color = '#facc15';
+                cvssBadge.style.border = '1px solid rgba(234, 179, 8, 0.5)';
+                iconBox.style.background = 'rgba(234, 179, 8, 0.2)';
+                iconBox.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+            } else {
+                cvssBadge.textContent = 'BAJO';
+                cvssBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+                cvssBadge.style.color = '#34d399';
+                cvssBadge.style.border = '1px solid rgba(16, 185, 129, 0.5)';
+                iconBox.style.background = 'rgba(16, 185, 129, 0.2)';
+                iconBox.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+            }
+
+            // 3. Puertos y Servicios Expuestos
+            const portsList = document.getElementById('popoverPortsList');
+            const openPorts = device.openPorts || [];
+
+            if (openPorts.length === 0) {
+                portsList.innerHTML = `
+                    <div class="popover-port-item">
+                        <div class="popover-port-header">
+                            <span class="mono" style="color: #10b981;">Sin puertos abiertos</span>
+                        </div>
+                        <div class="popover-port-desc">No se detectaron puertos TCP críticos accesibles en este host durante el barrido.</div>
+                    </div>
+                `;
+            } else {
+                portsList.innerHTML = openPorts.map(p => {
+                    const info = PORT_KNOWLEDGE_BASE[p] || {
+                        name: `Puerto TCP ${p}`,
+                        risk: 'Servicio de red activo en escucha. Auditar políticas de acceso.'
+                    };
+                    return `
+                        <div class="popover-port-item">
+                            <div class="popover-port-header">
+                                <span class="popover-port-num">Puerto ${p} &bull; ${escapeHtml(info.name)}</span>
+                            </div>
+                            <div class="popover-port-desc">${escapeHtml(info.risk)}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 4. Recomendación de Mitigación
+            const mitigationBox = document.getElementById('popoverMitigation');
+            mitigationBox.textContent = getMitigationRecommendation(device);
+
+            // 5. Timestamp
+            document.getElementById('popoverTimestamp').textContent = 
+                `Auditado: ${device.detectedAt || new Date().toLocaleTimeString('es-ES')}`;
+
+            // 6. Cálculo de Posición Inteligente en Pantalla
+            popover.style.display = 'block';
+            const rect = badgeElement.getBoundingClientRect();
+            const popWidth = 390;
+            const popHeight = popover.offsetHeight || 340;
+
+            // Intentar posicionar a la izquierda del badge para que no se corte por el borde derecho
+            let left = rect.left - popWidth - 12;
+            if (left < 16) {
+                // Si no cabe a la izquierda, intentar a la derecha
+                left = rect.right + 12;
+                if (left + popWidth > window.innerWidth - 16) {
+                    left = (window.innerWidth - popWidth) / 2;
+                }
+            }
+
+            // Alinear verticalmente con el badge centrado
+            let top = rect.top + (rect.height / 2) - (popHeight / 2);
+            if (top + popHeight > window.innerHeight - 16) {
+                top = window.innerHeight - popHeight - 16;
+            }
+            if (top < 16) {
+                top = 16;
+            }
+
+            popover.style.left = `${Math.round(left)}px`;
+            popover.style.top = `${Math.round(top)}px`;
+
+            // Activar transición fluida
+            requestAnimationFrame(() => {
+                popover.classList.add('active');
+            });
+        }
+
+        function getMitigationRecommendation(device) {
+            const ports = device.openPorts || [];
+
+            if (ports.includes(23)) {
+                return 'Deshabilitar de inmediato el daemon de Telnet (puerto 23) y migrar la administración remota a SSH v2 con autenticación por clave pública.';
+            }
+            if (ports.includes(445)) {
+                return 'Aislar el puerto SMB (445) mediante el firewall perimetral y local. Desactivar SMBv1 y restringir el acceso entre hosts del mismo segmento para evitar movimientos laterales.';
+            }
+            if (ports.includes(3389)) {
+                return 'Bloquear la exposición directa del puerto RDP (3389) a la subred. Exigir autenticación a nivel de red (NLA) o canalizar el acceso exclusivamente mediante túnel VPN corporativo.';
+            }
+            if (ports.includes(21)) {
+                return 'Deshabilitar el protocolo FTP en texto claro. Migrar la transferencia de archivos a SFTP (puerto 22) o FTPS con certificados TLS actualizados.';
+            }
+            if (ports.includes(80) || ports.includes(8080)) {
+                return 'Implementar certificados digitales SSL/TLS y forzar redirección automática HTTPS (puerto 443). Restringir consolas de administración interna.';
+            }
+            if (ports.includes(22)) {
+                return 'Canal cifrado seguro. Se recomienda desactivar la autenticación por contraseña y permitir únicamente llaves SSH protegidas.';
+            }
+
+            return 'Mantener el firmware y sistema operativo actualizados con los últimos parches de seguridad. Verificar que no se expongan servicios innecesarios en la red local.';
+        }
+
+        function scheduleHidePopover() {
+            popoverHideTimeout = setTimeout(() => {
+                hidePopoverImmediate();
+            }, 180);
+        }
+
+        function cancelHidePopover() {
+            if (popoverHideTimeout) {
+                clearTimeout(popoverHideTimeout);
+                popoverHideTimeout = null;
+            }
+        }
+
+        function hidePopoverImmediate() {
+            const popover = document.getElementById('vulnPopover');
+            popover.classList.remove('active');
+            setTimeout(() => {
+                if (!popover.classList.contains('active')) {
+                    popover.style.display = 'none';
+                }
+            }, 200);
+        }
+
+        // ==========================================
+        // Iconos de Dispositivos SVG
+        // ==========================================
         function getDeviceIcon(type) {
             type = (type || '').toLowerCase();
             if (type.includes('router') || type.includes('puerta')) {

@@ -479,7 +479,7 @@ public class LocalNetworkScannerService {
     private String determineOs(Integer ttl, boolean isLocalHost, List<Integer> openPorts) {
         if (isLocalHost) {
             String osName = System.getProperty("os.name");
-            return osName != null ? osName : "Host Local";
+            return osName != null ? osName : "Host local";
         }
 
         if (ttl != null) {
@@ -488,7 +488,7 @@ public class LocalNetworkScannerService {
             } else if (ttl >= 65 && ttl <= 128) {
                 return "Microsoft Windows";
             } else if (ttl >= 129 && ttl <= 255) {
-                return "Dispositivo de Red (Cisco, Router, Switch)";
+                return "Dispositivo de red (Cisco, Router, Switch)";
             }
         }
 
@@ -500,7 +500,7 @@ public class LocalNetworkScannerService {
             return "Linux / Unix (Heurística)";
         }
 
-        return "Desconocido / Bloqueado por Firewall";
+        return "Desconocido / bloqueado por firewall";
     }
 
     /**
@@ -511,7 +511,7 @@ public class LocalNetworkScannerService {
             try {
                 return InetAddress.getLocalHost().getHostName();
             } catch (UnknownHostException ignored) {
-                return "Host Local (Este Equipo)";
+                return "Host local (este equipo)";
             }
         }
 
@@ -535,7 +535,7 @@ public class LocalNetworkScannerService {
 
         // Fallbacks heurísticos cuando no hay DNS inverso
         if (ip.equals(gatewayIp)) {
-            return "Puerta de Enlace (Router Principal)";
+            return "Puerta de enlace (Router principal)";
         }
 
         if (vendor != null && !vendor.contains("Desconocido")) {
@@ -565,11 +565,11 @@ public class LocalNetworkScannerService {
                 || vLower.contains("tp-link") || vLower.contains("cisco") || vLower.contains("hitron")
                 || vLower.contains("huawei") || vLower.contains("netgear") || vLower.contains("d-link")
                 || vLower.contains("ubiquiti")) {
-            return "Router / Puerta de Enlace";
+            return "Router / Puerta de enlace";
         }
 
         if (openPorts.contains(445) || openPorts.contains(3389) || os.contains("Windows")) {
-            return "Estación de Trabajo Windows";
+            return "Estación de trabajo Windows";
         }
 
         if (openPorts.contains(22) || os.contains("Linux")) {
@@ -577,15 +577,15 @@ public class LocalNetworkScannerService {
         }
 
         if (vLower.contains("apple") || vLower.contains("samsung") || vLower.contains("xiaomi")) {
-            return "Dispositivo Móvil / Tablet";
+            return "Dispositivo móvil / tablet";
         }
 
         if (vLower.contains("espressif") || vLower.contains("tuya") || vLower.contains("raspberry")
                 || vLower.contains("amazon") || vLower.contains("google")) {
-            return "Dispositivo IoT / Domótica";
+            return "Dispositivo IoT / domótica";
         }
 
-        return "Host Genérico";
+        return "Host genérico";
     }
 
     /**
