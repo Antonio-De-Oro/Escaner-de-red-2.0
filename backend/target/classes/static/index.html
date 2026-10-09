@@ -1012,6 +1012,76 @@
             line-height: 1.45;
         }
 
+        .popover-mitigation-box.critical-mode {
+            background: transparent;
+            border: none;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .popover-app-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .popover-app-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .popover-app-item.is-critical {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        .popover-app-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+
+        .popover-app-port {
+            background: rgba(0, 212, 255, 0.15);
+            color: #38bdf8;
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 5px;
+            letter-spacing: 0.3px;
+        }
+
+        .popover-app-port.crit {
+            background: rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .popover-app-name {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #f8fafc;
+        }
+
+        .popover-app-proc {
+            font-size: 0.72rem;
+            color: #38bdf8;
+            margin-bottom: 3px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .popover-app-desc {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            line-height: 1.38;
+        }
+
         .popover-footer {
             padding: 10px 18px;
             background: rgba(0, 0, 0, 0.25);
@@ -1198,7 +1268,7 @@
                 <button class="filter-btn" data-filter="CRÍTICO" onclick="setRiskFilter('CRÍTICO', this)">Crítico</button>
                 <button class="filter-btn" data-filter="ALTO" onclick="setRiskFilter('ALTO', this)">Alto</button>
                 <button class="filter-btn" data-filter="MEDIO" onclick="setRiskFilter('MEDIO', this)">Medio</button>
-                <button class="filter-btn" data-filter="BAJO" onclick="setRiskFilter('BAJO', this)">Seguro</button>
+                <button class="filter-btn" data-filter="BAJO" onclick="setRiskFilter('BAJO', this)">Bajo</button>
             </div>
         </div>
 
@@ -1278,15 +1348,17 @@
                 </div>
             </div>
 
-            <div class="popover-section">
-                <div class="popover-section-title">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    </svg>
-                    Recomendación de mitigación
+            <div class="popover-section" id="popoverDynamicSection">
+                <div class="popover-section-title" id="popoverDynamicTitle">
+                    <span id="popoverDynamicIcon" style="display: inline-flex; align-items: center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </span>
+                    <span id="popoverDynamicTitleText">Recomendación de mitigación</span>
                 </div>
                 <div class="popover-mitigation-box" id="popoverMitigation">
-                    <!-- Recomendación técnica generada -->
+                    <!-- Contenido dinámico según severidad -->
                 </div>
             </div>
         </div>
@@ -1763,9 +1835,35 @@
                 }).join('');
             }
 
-            // 4. Recomendación de Mitigación
+            // 4. Sección Dinámica: Si es CRÍTICO, mostrar aplicación/servicio de ese puerto en ese equipo; si es BAJO (o no crítico), mantener la recomendación de mitigación.
             const mitigationBox = document.getElementById('popoverMitigation');
-            mitigationBox.textContent = getMitigationRecommendation(device);
+            const titleTextElem = document.getElementById('popoverDynamicTitleText');
+            const iconElem = document.getElementById('popoverDynamicIcon');
+
+            if (device.riskLevel === 'CRÍTICO') {
+                if (titleTextElem) titleTextElem.textContent = 'Servicios en ejecución por puerto';
+                if (iconElem) {
+                    iconElem.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    `;
+                }
+                mitigationBox.classList.add('critical-mode');
+                mitigationBox.innerHTML = renderCriticalHostAppInfo(device);
+            } else {
+                if (titleTextElem) titleTextElem.textContent = 'Recomendación de mitigación';
+                if (iconElem) {
+                    iconElem.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    `;
+                }
+                mitigationBox.classList.remove('critical-mode');
+                mitigationBox.textContent = getMitigationRecommendation(device);
+            }
 
             // 5. Timestamp
             document.getElementById('popoverTimestamp').textContent = 
@@ -1803,6 +1901,270 @@
             requestAnimationFrame(() => {
                 popover.classList.add('active');
             });
+        }
+
+        function getHostPortServiceDetails(port, device) {
+            const os = (device.os || '').toLowerCase();
+            const type = (device.deviceType || '').toLowerCase();
+            const vendor = (device.vendor || '').toLowerCase();
+            const isWindows = os.includes('windows') || type.includes('windows');
+            const isLinux = os.includes('linux') || type.includes('linux');
+            const isRouter = type.includes('router') || type.includes('puerta') || vendor.includes('tp-link') || vendor.includes('cisco') || vendor.includes('huawei') || vendor.includes('netgear') || vendor.includes('d-link') || vendor.includes('hitron') || vendor.includes('asus');
+            const isApple = os.includes('mac') || os.includes('ios') || os.includes('apple') || vendor.includes('apple');
+
+            switch (port) {
+                case 445:
+                    if (isWindows) {
+                        return {
+                            name: 'Microsoft LanmanServer (Servidor SMB de Windows)',
+                            process: 'System / srv2.sys (Servicio LanmanServer)',
+                            desc: 'Servicio nativo del sistema para compartir archivos, carpetas, impresoras y comunicación interproceso mediante canalizaciones con nombre (Named Pipes).'
+                        };
+                    } else if (isLinux) {
+                        return {
+                            name: 'Samba Daemon (smbd)',
+                            process: '/usr/sbin/smbd (Servicio Samba/CIFS)',
+                            desc: 'Servicio de compartición de archivos y directorios en red para interoperabilidad con clientes Windows mediante el protocolo SMB/CIFS.'
+                        };
+                    } else if (isRouter) {
+                        return {
+                            name: 'Servidor Samba embebido en router',
+                            process: 'smbd / firmware daemon',
+                            desc: 'Servicio integrado en el router para compartir discos duros USB o almacenamiento de red en la LAN sin autenticación estricta.'
+                        };
+                    } else {
+                        return {
+                            name: 'Servidor SMB / CIFS (Server Message Block)',
+                            process: 'Servicio de red de compartición de recursos',
+                            desc: 'Servicio del sistema ejecutándose en escucha para intercambio de archivos y llamadas a procedimientos remotos (RPC).'
+                        };
+                    }
+                case 23:
+                    if (isRouter) {
+                        return {
+                            name: 'BusyBox telnetd (CLI del router)',
+                            process: 'telnetd (Firmware shell daemon)',
+                            desc: 'Consola de administración por línea de comandos embebida en el router. Permite control interactivo del equipo sin cifrado de contraseñas.'
+                        };
+                    } else if (isWindows) {
+                        return {
+                            name: 'Servicio Telnet de Windows',
+                            process: 'tlntsvr.exe (Microsoft Telnet Service)',
+                            desc: 'Servicio desusado del sistema operativo que permite inicios de sesión remotos en la línea de comandos en texto plano.'
+                        };
+                    } else if (isLinux) {
+                        return {
+                            name: 'GNU inetd / telnetd',
+                            process: '/usr/sbin/in.telnetd',
+                            desc: 'Daemon de inicio de sesión de terminal virtual Telnet para acceso remoto a shell sin protección criptográfica.'
+                        };
+                    } else {
+                        return {
+                            name: 'Daemon de consola Telnet',
+                            process: 'telnetd / Servicio de terminal remota',
+                            desc: 'Servicio de acceso por consola de comandos interactiva que transmite credenciales y sesiones sin cifrar.'
+                        };
+                    }
+                case 21:
+                    if (isWindows) {
+                        return {
+                            name: 'Microsoft IIS FTP Service / FileZilla Server',
+                            process: 'svchost.exe (ftpsvc) o FileZillaServer.exe',
+                            desc: 'Servicio de transferencia de archivos FTP configurado en el equipo para gestión remota de carpetas.'
+                        };
+                    } else if (isLinux) {
+                        return {
+                            name: 'vsftpd / ProFTPD / Pure-FTPd',
+                            process: '/usr/sbin/vsftpd (FTP Daemon)',
+                            desc: 'Servicio de servidor FTP para transferencia de datos y descargas en red.'
+                        };
+                    } else if (isRouter) {
+                        return {
+                            name: 'Servidor FTP integrado en router',
+                            process: 'vsftpd / bftpd (Firmware daemon)',
+                            desc: 'Servicio embebido para compartir archivos desde unidades de almacenamiento conectadas al router.'
+                        };
+                    } else {
+                        return {
+                            name: 'Servidor FTP (File Transfer Protocol)',
+                            process: 'Servicio de transferencia de ficheros',
+                            desc: 'Aplicación en escucha para transferencia y sincronización de archivos en red local.'
+                        };
+                    }
+                case 22:
+                    if (isLinux || isApple) {
+                        return {
+                            name: 'OpenSSH Server Daemon (sshd)',
+                            process: '/usr/sbin/sshd (OpenSSH Daemon)',
+                            desc: 'Servicio de terminal remota cifrada y transferencia segura por SFTP/SCP en Unix/Linux.'
+                        };
+                    } else if (isWindows) {
+                        return {
+                            name: 'OpenSSH SSH Server para Windows',
+                            process: 'sshd.exe (OpenSSH Server Service)',
+                            desc: 'Servicio de Windows para administración remota por terminal PowerShell/CMD cifrada.'
+                        };
+                    } else if (isRouter) {
+                        return {
+                            name: 'Dropbear SSH / OpenSSH embebido',
+                            process: 'dropbear (Daemon SSH para routers)',
+                            desc: 'Servidor SSH ligero integrado en el firmware para acceso y gestión administrativa segura.'
+                        };
+                    } else {
+                        return {
+                            name: 'Servidor SSH (Secure Shell)',
+                            process: 'sshd (Servicio de acceso remoto cifrado)',
+                            desc: 'Servicio de comunicación y consola remota con cifrado criptográfico.'
+                        };
+                    }
+                case 53:
+                    if (isRouter) {
+                        return {
+                            name: 'dnsmasq (Resolvedor y caché DNS del router)',
+                            process: 'dnsmasq (Daemon DNS/DHCP)',
+                            desc: 'Servicio integrado en el router que traduce nombres de dominio y gestiona la caché DNS de toda la red local.'
+                        };
+                    } else if (isWindows) {
+                        return {
+                            name: 'Servicio Servidor DNS de Microsoft',
+                            process: 'dns.exe (Microsoft DNS Server)',
+                            desc: 'Servicio de resolución de nombres y zonas de dominio para redes locales o Active Directory.'
+                        };
+                    } else {
+                        return {
+                            name: 'Servidor de resolución DNS',
+                            process: 'named / dnsmasq / systemd-resolved',
+                            desc: 'Servicio de resolución y consulta de nombres de dominio en la red local.'
+                        };
+                    }
+                case 80:
+                    if (isRouter) {
+                        return {
+                            name: 'Consola web de administración del router',
+                            process: 'micro_httpd / lighttpd / mini_httpd',
+                            desc: 'Servidor web embebido que aloja el portal de configuración y estado del router.'
+                        };
+                    } else if (isWindows) {
+                        return {
+                            name: 'Microsoft IIS / Servidor web local',
+                            process: 'w3wp.exe (IIS Worker) o HTTP.sys',
+                            desc: 'Servidor web corporativo de Windows o aplicación web en desarrollo (Node.js/ASP.NET).'
+                        };
+                    } else if (isLinux) {
+                        return {
+                            name: 'Apache HTTP Server (httpd) / Nginx',
+                            process: '/usr/sbin/apache2 o nginx',
+                            desc: 'Servidor web de código abierto sirviendo páginas o APIs web HTTP.'
+                        };
+                    } else {
+                        return {
+                            name: 'Servidor Web HTTP',
+                            process: 'Servicio o servidor web activo',
+                            desc: 'Aplicación web alojada en el equipo accesible mediante navegador en puerto estándar.'
+                        };
+                    }
+                case 443:
+                    if (isRouter) {
+                        return {
+                            name: 'Panel web seguro HTTPS del router',
+                            process: 'lighttpd / uhttpd (con soporte SSL)',
+                            desc: 'Interfaz gráfica de gestión del router con comunicación cifrada mediante TLS.'
+                        };
+                    } else if (isWindows) {
+                        return {
+                            name: 'Microsoft IIS con enlace SSL/TLS',
+                            process: 'w3wp.exe / HTTP.sys (HTTPS)',
+                            desc: 'Servidor web de Microsoft con certificados digitales configurados para navegación segura.'
+                        };
+                    } else if (isLinux) {
+                        return {
+                            name: 'Nginx / Apache con módulo SSL',
+                            process: 'nginx / httpd (OpenSSL mod_ssl)',
+                            desc: 'Servidor web con cifrado de transporte HTTPS activo.'
+                        };
+                    } else {
+                        return {
+                            name: 'Servidor Web Seguro HTTPS',
+                            process: 'Servicio web seguro con TLS/SSL',
+                            desc: 'Aplicación web con canal seguro cifrado de extremo a extremo.'
+                        };
+                    }
+                case 3389:
+                    if (isWindows) {
+                        return {
+                            name: 'Microsoft Terminal Services (Escritorio remoto)',
+                            process: 'svchost.exe -k termsvcs (TermService)',
+                            desc: 'Servicio nativo de Windows que permite a usuarios conectarse e interactuar con el escritorio de este equipo mediante RDP.'
+                        };
+                    } else {
+                        return {
+                            name: 'Servidor XRDP / Terminal Remoto',
+                            process: 'xrdp / xrdp-sesman',
+                            desc: 'Servicio de acceso gráfico remoto compatible con el protocolo RDP de Microsoft.'
+                        };
+                    }
+                case 8080:
+                    if (isRouter) {
+                        return {
+                            name: 'Consola de gestión web secundaria del router',
+                            process: 'httpd alternativo',
+                            desc: 'Puerto secundario configurado en el router para acceso al panel de control.'
+                        };
+                    } else {
+                        return {
+                            name: 'Apache Tomcat / Spring Boot / Servidor de desarrollo',
+                            process: 'java.exe / node.exe / servidor de aplicaciones',
+                            desc: 'Contenedor de aplicaciones web, entorno de desarrollo local o proxy web.'
+                        };
+                    }
+                default:
+                    return {
+                        name: `Servicio de red TCP en puerto ${port}`,
+                        process: 'Proceso del sistema operativo',
+                        desc: 'Aplicación o daemon del sistema escuchando conexiones entrantes en este host.'
+                    };
+            }
+        }
+
+        function renderCriticalHostAppInfo(device) {
+            const ports = device.openPorts || [];
+            // Priorizar puertos críticos que provocaron la severidad CRÍTICO (23, 445), luego los demás
+            const criticalPorts = ports.filter(p => p === 23 || p === 445);
+            const otherPorts = ports.filter(p => p !== 23 && p !== 445);
+            const sortedPorts = [...criticalPorts, ...otherPorts];
+
+            if (sortedPorts.length === 0) {
+                return `
+                    <div class="popover-app-item is-critical">
+                        <div class="popover-app-header">
+                            <span class="popover-app-port mono crit">CRÍTICO</span>
+                            <span class="popover-app-name">Proceso del sistema con configuración vulnerable</span>
+                        </div>
+                        <div class="popover-app-desc">
+                            El host fue catalogado como crítico debido a respuestas anómalas o exposición en la red local.
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="popover-app-list">
+                    ${sortedPorts.map(p => {
+                        const info = getHostPortServiceDetails(p, device);
+                        const isCrit = (p === 23 || p === 445);
+                        return `
+                            <div class="popover-app-item ${isCrit ? 'is-critical' : 'non-critical'}">
+                                <div class="popover-app-header">
+                                    <span class="popover-app-port mono ${isCrit ? 'crit' : 'normal'}">Puerto ${p}</span>
+                                    <span class="popover-app-name">${escapeHtml(info.name)}</span>
+                                </div>
+                                <div class="popover-app-proc">${escapeHtml(info.process)}</div>
+                                <div class="popover-app-desc">${escapeHtml(info.desc)}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
         }
 
         function getMitigationRecommendation(device) {
