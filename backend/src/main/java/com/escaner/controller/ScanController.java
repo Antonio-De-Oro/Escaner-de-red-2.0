@@ -3,6 +3,7 @@ package com.escaner.controller;
 import com.escaner.service.LocalNetworkScannerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -19,10 +20,12 @@ public class ScanController {
         this.scannerService = scannerService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/scan")
-    public ResponseEntity<Map<String, String>> startScan() {
-        System.out.println("=== RECIBIDA PETICIÓN POST /api/scan ===");
-        boolean started = scannerService.startScanAsync();
+    public ResponseEntity<Map<String, String>> startScan(org.springframework.security.core.Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : null;
+        System.out.println("=== RECIBIDA PETICIÓN POST /api/scan POR: " + username + " ===");
+        boolean started = scannerService.startScanAsync(username);
         if (started) {
             System.out.println("=== ESCANEO LOCAL INICIADO EXITOSAMENTE ===");
             return ResponseEntity.ok(Map.of("status", "Escaneo iniciado en la interfaz local"));

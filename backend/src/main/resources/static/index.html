@@ -92,7 +92,6 @@
             color: var(--text-muted);
             font-weight: 700;
             letter-spacing: 0.8px;
-            text-transform: uppercase;
         }
 
         .engine-label .pulse-indicator {
@@ -144,6 +143,66 @@
         .ws-badge.disconnected {
             border-color: rgba(239, 68, 68, 0.35);
             color: #fca5a5;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            color: var(--text-main);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-role-pill {
+            font-size: 0.68rem;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(0, 212, 255, 0.35);
+        }
+
+        .user-role-pill.admin {
+            background: rgba(239, 68, 68, 0.18);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.45);
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 0.74rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            margin-left: 2px;
+            border: 1px solid transparent;
+        }
+
+        .btn-logout:hover {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.14);
+            border-color: rgba(239, 68, 68, 0.3);
         }
 
         /* Contenedor Principal */
@@ -453,7 +512,7 @@
             font-size: 0.82rem;
             font-weight: 700;
             color: var(--text-muted);
-            text-transform: uppercase;
+            text-transform: none;
             letter-spacing: 0.6px;
         }
 
@@ -661,7 +720,7 @@
             padding: 16px 20px;
             font-weight: 700;
             color: var(--text-muted);
-            text-transform: uppercase;
+            text-transform: none;
             font-size: 0.75rem;
             letter-spacing: 0.6px;
             white-space: nowrap;
@@ -1093,6 +1152,242 @@
             color: var(--text-dark);
         }
 
+        /* ==========================================
+           Banner de Inspección de Auditoría Histórica
+           ========================================== */
+        .active-audit-banner {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.16), rgba(99, 102, 241, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            border-left: 4px solid var(--primary);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.4);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .banner-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .banner-text h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #93c5fd;
+        }
+
+        .banner-text p {
+            margin: 3px 0 0 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-banner-clear {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-light);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-banner-clear:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+
+        /* ==========================================
+           Historial de Auditorías de Red
+           ========================================== */
+        .history-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 30px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-title-group h2 {
+            font-size: 1.18rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .history-subtitle {
+            margin: 4px 0 0 0;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .history-badge-count {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 12px 14px;
+            font-size: 0.78rem;
+            color: var(--text-dark);
+            text-transform: none;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-table td {
+            padding: 13px 14px;
+            font-size: 0.84rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            vertical-align: middle;
+        }
+
+        .history-row {
+            transition: background 0.15s ease;
+        }
+
+        .history-row:hover {
+            background: rgba(30, 41, 59, 0.6);
+        }
+
+        .history-row.active-audit {
+            background: rgba(59, 130, 246, 0.12) !important;
+            border-left: 3px solid var(--primary);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-pill.completado {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-pill.en-proceso {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-pill.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .threat-count-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .threat-count-pill.has-crit {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .threat-count-pill.no-crit {
+            background: rgba(16, 185, 129, 0.12);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-table-action {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-light);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-table-action:hover {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: rgba(59, 130, 246, 0.45);
+            color: #93c5fd;
+        }
+
+        .btn-table-action.btn-inspect {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.35);
+            color: #60a5fa;
+        }
+
+        .btn-table-action.btn-inspect:hover {
+            background: rgba(59, 130, 246, 0.3);
+            color: #ffffff;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -1126,11 +1421,29 @@
     <div class="top-bar">
         <div class="engine-label">
             <span class="pulse-indicator"></span>
-            SERVICIO DE AUDITORÍA DE RED
+            Servicio de auditoría de red
         </div>
-        <div class="ws-badge disconnected" id="wsBadge">
-            <span class="ws-dot"></span>
-            <span id="wsStatusText">Desconectado</span>
+        <div class="top-bar-right">
+            <div class="user-info-badge" id="userInfoBadge" style="display: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span id="currentUserName">Usuario</span>
+                <span class="user-role-pill" id="currentUserRole">AUDITOR</span>
+                <a href="/logout" class="btn-logout" title="Cerrar sesión segura">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Salir
+                </a>
+            </div>
+            <div class="ws-badge disconnected" id="wsBadge">
+                <span class="ws-dot"></span>
+                <span id="wsStatusText">Desconectado</span>
+            </div>
         </div>
     </div>
 
@@ -1202,7 +1515,7 @@
                     </div>
                 </div>
                 <div class="kpi-value mono" id="kpiScanned">0 / 254</div>
-                <div class="kpi-subtitle">Segmento CIDR completo</div>
+                <div class="kpi-subtitle">Segmento de red completo</div>
             </div>
 
             <div class="kpi-card">
@@ -1272,6 +1585,30 @@
             </div>
         </div>
 
+        <!-- Banner de Inspección de Auditoría Histórica -->
+        <div id="activeAuditBanner" class="active-audit-banner">
+            <div class="banner-content">
+                <div class="banner-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="banner-text">
+                    <h4 id="bannerTitle">Inspección de auditoría histórica #<span id="bannerAuditId">1</span></h4>
+                    <p id="bannerSubtitle">Mostrando resultados almacenados en base de datos &bull; Modo de consulta de solo lectura</p>
+                </div>
+            </div>
+            <div class="banner-actions">
+                <button class="btn-banner-clear" onclick="resetToLiveView()" title="Limpiar selección y volver a vista en vivo">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    Volver a vista en vivo
+                </button>
+            </div>
+        </div>
+
         <!-- Tabla Enriquecida de Resultados -->
         <div class="table-card">
             <div class="table-responsive">
@@ -1307,9 +1644,61 @@
             </div>
         </div>
 
+        <!-- Sección de Historial de Auditorías de Red (MariaDB) -->
+        <div class="history-card" id="historySection">
+            <div class="history-header">
+                <div class="history-title-group">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <h2>Historial de auditorías de red</h2>
+                        <span class="history-badge-count" id="historyCountBadge">0 sesiones</span>
+                    </div>
+                    <p class="history-subtitle">Registro cronológico de escaneos y hallazgos persistidos en MariaDB</p>
+                </div>
+                <div class="history-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="fetchAuditHistory()" title="Actualizar lista de auditorías de red">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <polyline points="1 20 1 14 7 14"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                        Actualizar historial
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha y hora</th>
+                            <th>Subred / gateway</th>
+                            <th>Dispositivos</th>
+                            <th>Críticos</th>
+                            <th>Duración</th>
+                            <th>Operador</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 25px; color: var(--text-dark);">
+                                Cargando historial de auditorías...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer>
-            <strong>VULNERASOLVE &copy; 2026</strong><br>
+            <strong>VulneraSolve &copy; 2026</strong><br>
             Auditoría de superficie de ataque en red de área local (LAN) &bull; Spring Boot + WebSocket
         </footer>
 
@@ -1433,6 +1822,8 @@
         window.onload = function() {
             connectWebSocket();
             fetchInitialStatus();
+            fetchCurrentUser();
+            fetchAuditHistory();
 
             // Cerrar popover al hacer clic fuera
             document.addEventListener('click', function(e) {
@@ -1442,6 +1833,53 @@
                 }
             });
         };
+
+        let currentUser = null;
+
+        function fetchCurrentUser() {
+            fetch('/api/auth/me')
+                .then(r => r.json())
+                .then(user => {
+                    if (user && user.authenticated) {
+                        currentUser = user;
+                        const badge = document.getElementById('userInfoBadge');
+                        const nameElem = document.getElementById('currentUserName');
+                        const roleElem = document.getElementById('currentUserRole');
+                        nameElem.textContent = user.nombreCompleto || user.username;
+                        const roleName = user.isAdmin ? 'ADMIN' : 'AUDITOR';
+                        roleElem.textContent = roleName;
+                        if (user.isAdmin) {
+                            roleElem.classList.add('admin');
+                        } else {
+                            roleElem.classList.remove('admin');
+                        }
+                        badge.style.display = 'inline-flex';
+                        updateScanButtonForRole();
+                    }
+                })
+                .catch(e => console.warn('No se pudo obtener información de usuario:', e));
+        }
+
+        function updateScanButtonForRole() {
+            const startBtn = document.getElementById('startBtn');
+            const btnText = document.getElementById('btnText');
+            if (!startBtn || !btnText) return;
+            if (currentUser && !currentUser.isAdmin) {
+                startBtn.disabled = true;
+                startBtn.classList.add('btn-disabled');
+                startBtn.style.opacity = '0.5';
+                startBtn.style.cursor = 'not-allowed';
+                startBtn.title = 'Acción restringida: Se requieren privilegios de Administrador para iniciar auditorías de red.';
+                btnText.textContent = 'Iniciar auditoría (Solo admin)';
+            } else {
+                startBtn.disabled = false;
+                startBtn.classList.remove('btn-disabled');
+                startBtn.style.opacity = '1';
+                startBtn.style.cursor = 'pointer';
+                startBtn.title = '';
+                btnText.textContent = 'Iniciar auditoría de red';
+            }
+        }
 
         function fetchInitialStatus() {
             fetch('/api/status')
@@ -1488,6 +1926,11 @@
         // Control de Escaneo
         // ==========================================
         function startScan() {
+            if (currentUser && !currentUser.isAdmin) {
+                alert('Acción restringida: Se requiere el rol de Administrador para ejecutar auditorías de red. Los auditores cuentan con acceso de solo lectura.');
+                return;
+            }
+
             const startBtn = document.getElementById('startBtn');
             const spinner = document.getElementById('btnSpinner');
             const radarIcon = document.getElementById('radarIcon');
@@ -1500,6 +1943,11 @@
             btnText.textContent = 'Auditando red...';
 
             devices = [];
+            loadedAuditId = null;
+            const banner = document.getElementById('activeAuditBanner');
+            if (banner) banner.style.display = 'none';
+            document.querySelectorAll('.history-row').forEach(r => r.classList.remove('active-audit'));
+
             renderDevices();
             resetCounters();
 
@@ -1509,6 +1957,9 @@
 
             fetch('/api/scan', { method: 'POST' })
                 .then(res => {
+                    if (res.status === 403) {
+                        throw new Error('Acceso denegado (403): Solo los administradores tienen autorización para iniciar auditorías de red.');
+                    }
                     if (!res.ok) {
                         throw new Error('El backend reportó un error o ya está escaneando (HTTP ' + res.status + ')');
                     }
@@ -1531,11 +1982,25 @@
             const btnText = document.getElementById('btnText');
             const progressBox = document.getElementById('progressBox');
 
-            startBtn.disabled = false;
             spinner.style.display = 'none';
             radarIcon.style.display = 'inline-block';
-            btnText.textContent = 'Iniciar auditoría de red';
             progressBox.classList.remove('scanning');
+
+            if (currentUser && !currentUser.isAdmin) {
+                startBtn.disabled = true;
+                startBtn.classList.add('btn-disabled');
+                startBtn.style.opacity = '0.5';
+                startBtn.style.cursor = 'not-allowed';
+                startBtn.title = 'Acción restringida: Se requieren privilegios de Administrador para iniciar auditorías de red.';
+                btnText.textContent = 'Iniciar auditoría (Solo admin)';
+            } else {
+                startBtn.disabled = false;
+                startBtn.classList.remove('btn-disabled');
+                startBtn.style.opacity = '1';
+                startBtn.style.cursor = 'pointer';
+                startBtn.title = '';
+                btnText.textContent = 'Iniciar auditoría de red';
+            }
 
             if (scanTimer) {
                 clearInterval(scanTimer);
@@ -1591,6 +2056,11 @@
                     document.getElementById('kpiTime').textContent = (data.time || 0) + 's';
                     document.getElementById('scanStatusMsg').textContent = 
                         `Auditoría finalizada. ${devices.length} dispositivos descubiertos en ${data.time || 0}s.`;
+                    fetchAuditHistory();
+                    break;
+
+                case 'audit_saved':
+                    fetchAuditHistory();
                     break;
 
                 case 'error':
@@ -2271,6 +2741,241 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        }
+
+        // ==========================================
+        // Historial de Auditorías (MariaDB)
+        // ==========================================
+        let auditHistory = [];
+        let loadedAuditId = null;
+
+        function fetchAuditHistory() {
+            fetch('/api/auditorias')
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(auditorias => {
+                    auditHistory = auditorias || [];
+                    const badge = document.getElementById('historyCountBadge');
+                    if (badge) {
+                        badge.textContent = `${auditHistory.length} ${auditHistory.length === 1 ? 'sesión' : 'sesiones'}`;
+                    }
+                    renderAuditHistoryTable();
+
+                    // Si la tabla superior está vacía y hay registros históricos,
+                    // cargar automáticamente la auditoría más reciente para que tanto
+                    // auditores como administradores tengan información de inmediato.
+                    if (devices.length === 0 && auditHistory.length > 0 && loadedAuditId === null) {
+                        loadAuditDetails(auditHistory[0].id, false);
+                    }
+                })
+                .catch(err => {
+                    console.warn('No se pudo obtener el historial de auditorías:', err);
+                    const tbody = document.getElementById('historyTableBody');
+                    if (tbody && auditHistory.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 25px; color: #f87171;">
+                                    No se pudo conectar con MariaDB para cargar el historial de auditorías.
+                                </td>
+                            </tr>
+                        `;
+                    }
+                });
+        }
+
+        function renderAuditHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            if (!tbody) return;
+
+            if (auditHistory.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9">
+                            <div class="empty-state" style="padding: 24px;">
+                                <p>No hay auditorías registradas en la base de datos aún.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            auditHistory.forEach(audit => {
+                const tr = document.createElement('tr');
+                tr.className = 'history-row' + (loadedAuditId === audit.id ? ' active-audit' : '');
+                tr.dataset.auditId = audit.id;
+
+                const fechaFormateada = audit.fechaInicio 
+                    ? new Date(audit.fechaInicio).toLocaleString('es-ES', { 
+                        year: 'numeric', month: '2-digit', day: '2-digit', 
+                        hour: '2-digit', minute: '2-digit', second: '2-digit' 
+                    })
+                    : 'Sin fecha';
+
+                const subredGw = `${escapeHtml(audit.subnetMask || '-')}<br><span style="font-size:0.75rem; color:var(--text-dark);">GW: ${escapeHtml(audit.gateway || '-')}</span>`;
+
+                const critPill = (audit.amenazasCriticas || 0) > 0 
+                    ? `<span class="threat-count-pill has-crit">${audit.amenazasCriticas} crítico${audit.amenazasCriticas > 1 ? 's' : ''}</span>`
+                    : `<span class="threat-count-pill no-crit">0</span>`;
+
+                const duracion = audit.duracionSegundos ? `${audit.duracionSegundos}s` : '-';
+                const operador = audit.operador || 'Sistema';
+
+                let estadoPill = '';
+                if (audit.estado === 'COMPLETADO') {
+                    estadoPill = '<span class="status-pill completado">&bull; Completado</span>';
+                } else if (audit.estado === 'EN_PROCESO') {
+                    estadoPill = '<span class="status-pill en-proceso">&bull; En proceso</span>';
+                } else {
+                    estadoPill = `<span class="status-pill error">&bull; ${escapeHtml(audit.estado || 'Desconocido')}</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td style="font-weight: 700; color: #94a3b8;">#${audit.id}</td>
+                    <td style="font-weight: 500; color: var(--text-light);">${fechaFormateada}</td>
+                    <td>${subredGw}</td>
+                    <td><strong style="color: #60a5fa;">${audit.hostsActivos}</strong> activos</td>
+                    <td>${critPill}</td>
+                    <td>${duracion}</td>
+                    <td><span style="font-size:0.8rem; color:#cbd5e1;">${escapeHtml(operador)}</span></td>
+                    <td>${estadoPill}</td>
+                    <td>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <button class="btn-table-action btn-inspect" onclick="loadAuditDetails(${audit.id}, true)" title="Inspeccionar dispositivos de esta auditoría">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                Inspeccionar
+                            </button>
+                            <button class="btn-table-action" onclick="exportAuditJson(${audit.id})" title="Descargar reporte en formato JSON">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                JSON
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function loadAuditDetails(auditId, scrollToTop = true) {
+            fetch('/api/auditorias/' + auditId)
+                .then(r => {
+                    if (!r.ok) throw new Error('Error al cargar la auditoría #' + auditId);
+                    return r.json();
+                })
+                .then(audit => {
+                    loadedAuditId = audit.id;
+
+                    // Actualizar banner superior
+                    const banner = document.getElementById('activeAuditBanner');
+                    if (banner) {
+                        const bannerAuditId = document.getElementById('bannerAuditId');
+                        const bannerSubtitle = document.getElementById('bannerSubtitle');
+                        const fechaTxt = audit.fechaInicio ? new Date(audit.fechaInicio).toLocaleString('es-ES') : '';
+
+                        if (bannerAuditId) bannerAuditId.textContent = audit.id;
+                        if (bannerSubtitle) {
+                            bannerSubtitle.innerHTML = `Sesión iniciada: ${fechaTxt} &bull; Operador: <strong>${escapeHtml(audit.operador || 'Sistema')}</strong> &bull; Modo de consulta de solo lectura`;
+                        }
+                        banner.style.display = 'flex';
+                    }
+
+                    // Cargar dispositivos en la tabla interactiva
+                    devices = audit.dispositivos || [];
+
+                    // Actualizar KPIs superiores
+                    const hostCount = audit.hostsActivos || devices.length;
+                    document.getElementById('kpiFound').textContent = hostCount;
+                    const threatCount = (audit.amenazasCriticas !== undefined && audit.amenazasCriticas !== null)
+                        ? audit.amenazasCriticas
+                        : devices.filter(d => d.riskLevel === 'CRÍTICO').length;
+                    document.getElementById('kpiThreats').textContent = threatCount;
+                    const threatCard = document.getElementById('kpiThreatsCard');
+                    if (threatCount > 0) {
+                        threatCard.classList.add('has-threats');
+                    } else {
+                        threatCard.classList.remove('has-threats');
+                    }
+
+                    document.getElementById('kpiTime').textContent = (audit.duracionSegundos || 0) + 's';
+                    document.getElementById('kpiScanned').textContent = `${hostCount} detectados`;
+                    document.getElementById('displaySubnet').textContent = audit.subnetMask || '-';
+                    document.getElementById('displayGateway').textContent = audit.gateway || '-';
+                    document.getElementById('progressBarFill').style.width = '100%';
+                    document.getElementById('progressPercentText').textContent = '100%';
+                    document.getElementById('scanStatusMsg').textContent = 
+                        `Auditoría histórica #${audit.id} cargada (${hostCount} dispositivos, ${threatCount} amenazas críticas).`;
+
+                    renderDevices();
+
+                    // Resaltar fila seleccionada en el historial
+                    document.querySelectorAll('.history-row').forEach(row => {
+                        if (row.dataset.auditId === String(audit.id)) {
+                            row.classList.add('active-audit');
+                        } else {
+                            row.classList.remove('active-audit');
+                        }
+                    });
+
+                    // Desplazar suavemente a la tabla de dispositivos si se solicitó
+                    if (scrollToTop) {
+                        const tableSection = document.getElementById('activeAuditBanner');
+                        if (tableSection) {
+                            tableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Error cargando detalles de auditoría:', err);
+                    alert('No se pudieron obtener los detalles de la auditoría #' + auditId);
+                });
+        }
+
+        function resetToLiveView() {
+            loadedAuditId = null;
+            const banner = document.getElementById('activeAuditBanner');
+            if (banner) banner.style.display = 'none';
+
+            document.querySelectorAll('.history-row').forEach(row => row.classList.remove('active-audit'));
+
+            devices = [];
+            renderDevices();
+            resetCounters();
+            document.getElementById('scanStatusMsg').textContent = 'Vista restaurada al modo en tiempo real. Listo para nueva auditoría.';
+        }
+
+        function exportAuditJson(auditId) {
+            fetch('/api/auditorias/' + auditId)
+                .then(r => {
+                    if (!r.ok) throw new Error('No se pudo descargar la auditoría');
+                    return r.json();
+                })
+                .then(audit => {
+                    const jsonStr = JSON.stringify(audit, null, 2);
+                    const blob = new Blob([jsonStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const fechaStr = audit.fechaInicio ? new Date(audit.fechaInicio).toISOString().slice(0, 10) : 'reporte';
+                    a.href = url;
+                    a.download = `VulneraSolve_Auditoria_${audit.id}_${fechaStr}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                })
+                .catch(err => {
+                    console.error('Error exportando auditoría en JSON:', err);
+                    alert('Error exportando la auditoría #' + auditId);
+                });
         }
     </script>
 </body>

@@ -1,6 +1,10 @@
 package com.escaner.service;
 
+import com.escaner.entity.Auditoria;
+import com.escaner.entity.Dispositivo;
+import com.escaner.entity.PuertoDispositivo;
 import com.escaner.model.ScanMessage;
+import com.escaner.repository.AuditoriaRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -9,6 +13,7 @@ import jakarta.annotation.PreDestroy;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,6 +25,9 @@ import java.util.regex.Pattern;
 public class LocalNetworkScannerService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final AuditoriaRepository auditoriaRepository;
+    private final com.escaner.repository.UsuarioRepository usuarioRepository;
+    private volatile String currentScanUser = null;
 
     @Value("${scanner.thread-pool-size:30}")
     private int threadPoolSize;
@@ -99,8 +107,12 @@ public class LocalNetworkScannerService {
         }
     }
 
-    public LocalNetworkScannerService(SimpMessagingTemplate messagingTemplate) {
+    public LocalNetworkScannerService(SimpMessagingTemplate messagingTemplate, 
+                                     AuditoriaRepository auditoriaRepository,
+                                     com.escaner.repository.UsuarioRepository usuarioRepository) {
         this.messagingTemplate = messagingTemplate;
+        this.auditoriaRepository = auditoriaRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public boolean isScanning() {
@@ -108,10 +120,16 @@ public class LocalNetworkScannerService {
     }
 
     public boolean startScanAsync() {
+        return startScanAsync(null);
+    }
+
+    public boolean startScanAsync(String username) {
         if (!scanning.compareAndSet(false, true)) {
             System.out.println("[SCANNER] Ya hay un escaneo en ejecución.");
             return false;
         }
+
+        this.currentScanUser = username;
 
         // Ejecutar en hilo de fondo desacoplado para liberar el hilo HTTP
         Thread scanThread = new Thread(this::performNetworkScan, "NetworkScanner-Worker");
@@ -158,13 +176,14 @@ public class LocalNetworkScannerService {
 
             AtomicInteger completedCount = new AtomicInteger(0);
             AtomicInteger foundCount = new AtomicInteger(0);
+            List<ScanMessage> discoveredDevices = Collections.synchronizedList(new ArrayList<>());
 
             List<CompletableFuture<Void>> futures = new ArrayList<>();
 
             for (String targetIp : subnetInfo.ipList) {
                 CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                     try {
-                        auditHost(targetIp, subnetInfo, initialArpTable, foundCount);
+                        auditHost(targetIp, subnetInfo, initialArpTable, foundCount, discoveredDevices);
                     } catch (Exception e) {
                         System.err.println("[SCANNER] Error auditando IP " + targetIp + ": " + e.getMessage());
                     } finally {
@@ -196,6 +215,9 @@ public class LocalNetworkScannerService {
             );
             messagingTemplate.convertAndSend("/topic/scan", completeMsg);
 
+            // 3. Persistir sesión de auditoría en MariaDB
+            persistAuditSession(subnetInfo, totalHosts, foundCount.get(), totalTimeSec, discoveredDevices);
+
         } catch (Exception e) {
             System.err.println("[SCANNER] Excepción general en el escaneo: " + e.getMessage());
             e.printStackTrace();
@@ -209,11 +231,79 @@ public class LocalNetworkScannerService {
         }
     }
 
+    private void persistAuditSession(SubnetInfo subnetInfo, int totalHosts, int activeHosts, long durationSec, List<ScanMessage> devices) {
+        try {
+            Auditoria auditoria = new Auditoria();
+            auditoria.setFechaInicio(LocalDateTime.now().minusSeconds(durationSec));
+            auditoria.setFechaFin(LocalDateTime.now());
+            auditoria.setRangoSubred(subnetInfo.subnetCidr);
+            auditoria.setGateway(subnetInfo.gatewayIp);
+            auditoria.setTotalHostsAnalizados(totalHosts);
+            auditoria.setHostsActivos(activeHosts);
+            auditoria.setDuracionSegundos(durationSec);
+            auditoria.setEstado("COMPLETADO");
+
+            if (this.currentScanUser != null) {
+                usuarioRepository.findByUsername(this.currentScanUser).ifPresent(auditoria::setUsuario);
+            }
+
+            Map<Integer, String> serviceNames = Map.of(
+                21, "FTP Service",
+                22, "SSH Server",
+                23, "Telnet Daemon",
+                53, "DNS Resolver",
+                80, "HTTP Web Server",
+                443, "HTTPS Web Server",
+                445, "SMB / LanmanServer",
+                3389, "RDP Terminal Service",
+                8080, "HTTP-Proxy / Alt"
+            );
+
+            for (ScanMessage d : devices) {
+                Dispositivo disp = new Dispositivo();
+                disp.setIp(d.getIp());
+                disp.setMac(d.getMac());
+                disp.setFabricante(d.getVendor());
+                disp.setHostname(d.getHostname());
+                disp.setSistemaOperativo(d.getOs());
+                disp.setTipoDispositivo(d.getDeviceType());
+                disp.setLatenciaMs(d.getLatencyMs());
+                disp.setNivelRiesgo(d.getRiskLevel());
+                disp.setDescripcionRiesgo(d.getRiskDescription());
+
+                if (d.getOpenPorts() != null) {
+                    for (Integer p : d.getOpenPorts()) {
+                        PuertoDispositivo pd = new PuertoDispositivo();
+                        pd.setNumeroPuerto(p);
+                        pd.setProtocolo("TCP");
+                        pd.setEsCritico(p == 23 || p == 445);
+                        pd.setServicioIdentificado(serviceNames.getOrDefault(p, "TCP " + p));
+                        disp.addPuerto(pd);
+                    }
+                }
+                auditoria.addDispositivo(disp);
+            }
+
+            Auditoria saved = auditoriaRepository.save(auditoria);
+            System.out.println(String.format("[SCANNER] Auditoría #%d persistida en MariaDB con %d dispositivos.", saved.getId(), devices.size()));
+
+            // Notificar al frontend que la sesión se guardó en la base de datos
+            messagingTemplate.convertAndSend("/topic/scan", Map.of(
+                "type", "audit_saved",
+                "auditId", saved.getId(),
+                "hostsCount", activeHosts,
+                "msg", "Auditoría persistida exitosamente en MariaDB"
+            ));
+        } catch (Exception e) {
+            System.err.println("[SCANNER] Advertencia al persistir en MariaDB: " + e.getMessage());
+        }
+    }
+
     /**
      * Audita un host específico de forma no intrusiva y emite el resultado si responde.
      */
     private void auditHost(String targetIp, SubnetInfo subnetInfo, Map<String, String> initialArpTable,
-                           AtomicInteger foundCount) {
+                           AtomicInteger foundCount, List<ScanMessage> discoveredDevices) {
         boolean isLocalHost = targetIp.equals(subnetInfo.localIp);
         boolean isReachable = false;
         Long latencyMs = null;
@@ -297,6 +387,8 @@ public class LocalNetworkScannerService {
         deviceMsg.setRiskLevel(risk.level);
         deviceMsg.setRiskDescription(risk.description);
         deviceMsg.setFound(foundCount.get());
+
+        discoveredDevices.add(deviceMsg);
 
         // Emitir el dispositivo descubierto en tiempo real
         messagingTemplate.convertAndSend("/topic/scan", deviceMsg);
