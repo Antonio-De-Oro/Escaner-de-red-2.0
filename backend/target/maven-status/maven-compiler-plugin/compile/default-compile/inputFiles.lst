@@ -1,6 +1,7 @@
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\service\LocalNetworkScannerService.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\entity\Auditoria.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\repository\PuertoDispositivoRepository.java
+C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\service\GeminiChatService.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\repository\UsuarioRepository.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\security\SecurityConfig.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\controller\AuditoriaController.java
@@ -11,6 +12,7 @@ C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\re
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\entity\HistorialChatIa.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\entity\Rol.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\controller\ScanController.java
+C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\controller\ChatController.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\entity\Dispositivo.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\NetworkScannerApplication.java
 C:\Users\gamer\Downloads\Escaner-de-red-2.0\backend\src\main\java\com\escaner\repository\DispositivoRepository.java

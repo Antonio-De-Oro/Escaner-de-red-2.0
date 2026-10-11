@@ -9,5 +9,7 @@ import java.util.List;
 @Repository
 public interface HistorialChatIaRepository extends JpaRepository<HistorialChatIa, Long> {
     List<HistorialChatIa> findByUsuarioIdOrderByFechaHoraDesc(Long usuarioId);
+    List<HistorialChatIa> findByUsuarioIdOrderByFechaHoraAsc(Long usuarioId);
+    void deleteByUsuarioId(Long usuarioId);
 }
 
