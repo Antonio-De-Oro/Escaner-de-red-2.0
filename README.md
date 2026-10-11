@@ -88,7 +88,7 @@ Normalmente, revisar esto requiere herramientas difíciles de manejar por consol
 ### 1. Diagrama de arquitectura
 Muestra cómo se comunican todas las piezas de la aplicación: el navegador web, el servidor en Spring Boot, la seguridad con Spring Security, la base de datos MariaDB y la nube de Google Gemini.
 
-![Diagrama de Arquitectura de VulneraSolve](diagrama_arquitectura_vulnerasolve.png)
+![Diagrama de Arquitectura de VulneraSolve](docs/img/diagrama_arquitectura_vulnerasolve.png)
 
 * **Capa Frontend:** Construida con HTML5 semántico, CSS moderno con estética oscura de ciberseguridad y JavaScript con WebSockets STOMP para recibir las alertas en vivo.
 * **Capa Backend (Spring Boot 3.2):** Controladores REST que exponen las rutas del sistema, interceptados por **Spring Security 6** para comprobar si el usuario es Administrador o Auditor.
@@ -101,7 +101,7 @@ Muestra cómo se comunican todas las piezas de la aplicación: el navegador web,
 ### 2. Modelo entidad-relación (base de datos)
 Topología de la base de datos relacional creada en MariaDB, normalizada en Tercera Forma Normal (3FN):
 
-![Modelo Entidad-Relación de VulneraSolve](modelo_entidad_relacion_vulnerasolve.png)
+![Modelo Entidad-Relación de VulneraSolve](docs/img/modelo_entidad_relacion_vulnerasolve.png)
 
 * **`usuarios`**: Guarda los usuarios del sistema (`username`, `email`, `activo`) y la contraseña cifrada con el algoritmo **BCrypt** (nunca en texto plano).
 * **`roles`**: Contiene los perfiles de permiso del sistema (`ROLE_ADMIN` y `ROLE_AUDITOR`).
@@ -116,7 +116,7 @@ Topología de la base de datos relacional creada en MariaDB, normalizada en Terc
 ### 3. Modelo de optimización operativa (I.O.)
 ¿A qué velocidad debemos enviar los paquetes de escaneo? La Investigación de Operaciones nos da la respuesta exacta mediante un modelo de **Programación Lineal**:
 
-![Gráfica de Optimización en Investigación de Operaciones](grafica_optimizacion_io.png)
+![Gráfica de Optimización en Investigación de Operaciones](docs/img/grafica_optimizacion_io.png)
 
 #### El problema real:
 * Si enviamos paquetes demasiado rápido, los sistemas de defensa de la red (firewalls e IDS/IPS) detectan una ráfaga y nos bloquean de inmediato, o dejamos sin internet a la oficina.
@@ -152,7 +152,7 @@ La mejor configuración posible es enviar **50 paquetes por segundo a puertos cr
 ### 4. Árbol del problema
 Resume por qué nació el proyecto VulneraSolve, identificando las causas raíz y los efectos negativos que sufren las organizaciones:
 
-![Árbol del problema VulneraSolve](arbol_del_problema_vulnerasolve.png)
+![Árbol del problema VulneraSolve](docs/img/arbol_del_problema_vulnerasolve.png)
 
 ---
 
