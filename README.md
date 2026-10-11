@@ -487,7 +487,7 @@ Proyecto desarrollado en el marco del programa de **Ingeniería de Sistemas — 
 * **Antonio Luis De Oro Vergara**
 * **Giovanny Daniel Gonzales Racero**
 * **José Luis Garay De La Vega**
-* **Jesus David Noriega Blanco**
+* **Jesús David Noriega Blanco**
 
 * **Docentes Asesores:** Ing. Fabio G. Ramirez y Lucia M. Tapia  
 * **Asignaturas Integradoras:** Desarrollo Web Avanzado e Investigación de Operaciones  
