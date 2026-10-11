@@ -88,7 +88,26 @@ Normalmente, revisar esto requiere herramientas difíciles de manejar por consol
 ### 1. Diagrama de arquitectura
 Muestra cómo se comunican todas las piezas de la aplicación: el navegador web, el servidor en Spring Boot, la seguridad con Spring Security, la base de datos MariaDB y la nube de Google Gemini.
 
-![Diagrama de Arquitectura de VulneraSolve](diagrama_arquitectura_vulnerasolve.png)
+```mermaid
+graph TD
+    Client["💻 Cliente Web / Dashboard UI"]
+    Security["🛡️ Spring Security 6 (Filtros de Autenticación y RBAC)"]
+    Controllers["🌐 Controladores REST y WebSockets (/api, /ws)"]
+    ServiceScan["⚙️ LocalNetworkScannerService (ThreadPoolExecutor)"]
+    ServiceChat["🤖 GeminiChatService (Asistente VulneraBot)"]
+    Repo["📦 Repositorios Spring Data JPA"]
+    DB[("🗄️ Base de Datos MariaDB 10")]
+    LLM["☁️ Google Gemini API (gemini-3.5-flash-lite)"]
+
+    Client -->|HTTP / WebSocket| Security
+    Security --> Controllers
+    Controllers --> ServiceScan
+    Controllers --> ServiceChat
+    ServiceScan --> Repo
+    ServiceChat --> Repo
+    Repo --> DB
+    ServiceChat -.->|HTTPS REST con contexto inyectado| LLM
+```
 
 * **Capa Frontend:** Construida con HTML5 semántico, CSS moderno con estética oscura de ciberseguridad y JavaScript con WebSockets STOMP para recibir las alertas en vivo.
 * **Capa Backend (Spring Boot 3.2):** Controladores REST que exponen las rutas del sistema, interceptados por **Spring Security 6** para comprobar si el usuario es Administrador o Auditor.
@@ -101,7 +120,15 @@ Muestra cómo se comunican todas las piezas de la aplicación: el navegador web,
 ### 2. Modelo entidad-relación (base de datos)
 Topología de la base de datos relacional creada en MariaDB, normalizada en Tercera Forma Normal (3FN):
 
-![Modelo Entidad-Relación de VulneraSolve](modelo_entidad_relacion_vulnerasolve.png)
+```mermaid
+erDiagram
+    USUARIOS ||--|{ USUARIOS_ROLES : posee
+    ROLES ||--|{ USUARIOS_ROLES : asigna
+    USUARIOS ||--o{ AUDITORIAS : ejecuta
+    AUDITORIAS ||--|{ DISPOSITIVOS : descubre
+    DISPOSITIVOS ||--|{ PUERTOS_DISPOSITIVO : contiene
+    USUARIOS ||--o{ HISTORIAL_CHAT_IA : consulta
+```
 
 * **`usuarios`**: Guarda los usuarios del sistema (`username`, `email`, `activo`) y la contraseña cifrada con el algoritmo **BCrypt** (nunca en texto plano).
 * **`roles`**: Contiene los perfiles de permiso del sistema (`ROLE_ADMIN` y `ROLE_AUDITOR`).
@@ -115,8 +142,6 @@ Topología de la base de datos relacional creada en MariaDB, normalizada en Terc
 
 ### 3. Modelo de optimización operativa (I.O.)
 ¿A qué velocidad debemos enviar los paquetes de escaneo? La Investigación de Operaciones nos da la respuesta exacta mediante un modelo de **Programación Lineal**:
-
-![Gráfica de Optimización en Investigación de Operaciones](grafica_optimizacion_io.png)
 
 #### El problema real:
 * Si enviamos paquetes demasiado rápido, los sistemas de defensa de la red (firewalls e IDS/IPS) detectan una ráfaga y nos bloquean de inmediato, o dejamos sin internet a la oficina.
@@ -139,10 +164,13 @@ Topología de la base de datos relacional creada en MariaDB, normalizada en Terc
 
 #### La solución óptima:
 Al evaluar los vértices del área geométrica permitida:
-* Punto $O(0, 0) \to Z = 0$
-* Punto $A(75, 0) \to Z = 112.5$
-* **Punto $B(50, 50) \to Z = 125.0$  ← [PUNTO ÓPTIMO GANADOR]**
-* Punto $C(40, 60) \to Z = 120.0$
+
+| Vértice | Coordenadas $(X_1, X_2)$ | Rendimiento $Z = 1.5 X_1 + 1.0 X_2$ | Interpretación analítica |
+| :---: | :---: | :---: | :--- |
+| **$O$** | $(0, 0)$ | $Z = 0.0$ | Sin tráfico de escaneo |
+| **$A$** | $(75, 0)$ | $Z = 112.5$ | Solo sondeo a puertos críticos |
+| **$B$** | **$(50, 50)$** | **$Z^* = 125.0$** | **Vértice Óptimo Ganador (Solución analítica)** |
+| **$C$** | $(40, 60)$ | $Z = 120.0$ | Límite del 40% de criticidad |
 
 **¿Qué significa en la práctica?**  
 La mejor configuración posible es enviar **50 paquetes por segundo a puertos críticos y 50 a puertos comunes**. Con esta combinación, el escáner trabaja a los 100 paquetes/segundo máximos que tolera el IDS sin levantar sospechas y aprovecha exactamente los 150 KB/s de canal sin poner lenta la red de la empresa.
@@ -152,7 +180,35 @@ La mejor configuración posible es enviar **50 paquetes por segundo a puertos cr
 ### 4. Árbol del problema
 Resume por qué nació el proyecto VulneraSolve, identificando las causas raíz y los efectos negativos que sufren las organizaciones:
 
-![Árbol del problema VulneraSolve](arbol_del_problema_vulnerasolve.png)
+```mermaid
+graph TD
+    subgraph Efectos ["⚠️ Efectos y Consecuencias Organizacionales"]
+        E1["Detección tardía de brechas y ventanas críticas de compromiso"]
+        E2["Remediaciones ineficaces o erróneas por administradores júnior"]
+        E3["Sobrecarga operativa y desperdicio de horas del equipo de TI"]
+        E4["Incumplimiento normativo (Ley 1273, Ley 1581) y falta de auditoría"]
+    end
+
+    subgraph ProblemaCentral ["🎯 Problema Central Identificado"]
+        P["Deficiencias críticas en la auditoría, priorización y remediación<br>de vulnerabilidades en redes LAN corporativas"]
+    end
+
+    subgraph Causas ["🔍 Causas Directas"]
+        C1["Escaneos manuales dispersos y reportes CLI crudos sin correlación"]
+        C2["Falta de orientación interactiva y contextual al mitigar fallos"]
+        C3["Asignación empírica y desordenada del tiempo operativo"]
+        C4["Carencia de control de acceso RBAC y trazabilidad de eventos"]
+    end
+
+    C1 --> P
+    C2 --> P
+    C3 --> P
+    C4 --> P
+    P --> E1
+    P --> E2
+    P --> E3
+    P --> E4
+```
 
 ---
 
@@ -487,7 +543,7 @@ Proyecto desarrollado en el marco del programa de **Ingeniería de Sistemas — 
 * **Antonio Luis De Oro Vergara**
 * **Giovanny Daniel Gonzales Racero**
 * **José Luis Garay De La Vega**
-* **Jesús David Noriega Blanco**
+* **Jesus David Noriega Blanco**
 
 * **Docentes Asesores:** Ing. Fabio G. Ramirez y Lucia M. Tapia  
 * **Asignaturas Integradoras:** Desarrollo Web Avanzado e Investigación de Operaciones  
