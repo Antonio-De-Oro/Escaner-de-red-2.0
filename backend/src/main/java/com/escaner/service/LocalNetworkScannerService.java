@@ -27,6 +27,7 @@ public class LocalNetworkScannerService {
     private final SimpMessagingTemplate messagingTemplate;
     private final AuditoriaRepository auditoriaRepository;
     private final com.escaner.repository.UsuarioRepository usuarioRepository;
+    private final AdaptiveRateLimiter rateLimiter;
     private volatile String currentScanUser = null;
 
     @Value("${scanner.thread-pool-size:30}")
@@ -43,7 +44,7 @@ public class LocalNetworkScannerService {
     private final ExecutorService dnsExecutor = Executors.newCachedThreadPool();
 
     // Puertos TCP estándar a auditar de manera no intrusiva
-    private static final int[] AUDIT_PORTS = {21, 22, 23, 53, 80, 443, 445, 3389, 8080};
+    private static final int[] AUDIT_PORTS = {21, 23, 445, 3389, 22, 53, 80, 443, 8080};
 
     // Catálogo OUI de fabricantes reconocidos (primeros 6 caracteres hexadecimales)
     private static final Map<String, String> OUI_VENDORS = new HashMap<>();
@@ -109,10 +110,12 @@ public class LocalNetworkScannerService {
 
     public LocalNetworkScannerService(SimpMessagingTemplate messagingTemplate, 
                                      AuditoriaRepository auditoriaRepository,
-                                     com.escaner.repository.UsuarioRepository usuarioRepository) {
+                                     com.escaner.repository.UsuarioRepository usuarioRepository,
+                                     AdaptiveRateLimiter rateLimiter) {
         this.messagingTemplate = messagingTemplate;
         this.auditoriaRepository = auditoriaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.rateLimiter = rateLimiter;
     }
 
     public boolean isScanning() {
@@ -157,8 +160,17 @@ public class LocalNetworkScannerService {
             System.out.println(String.format("[SCANNER] Subred: %s | Host: %s | Gateway: %s | Hosts a auditar: %d",
                     subnetInfo.subnetCidr, subnetInfo.localIp, subnetInfo.gatewayIp, totalHosts));
 
+            // Reiniciar contadores y temporizadores del Rate Limiter I.O. para esta sesión
+            rateLimiter.resetSessionCounters();
+
             // Snapshot inicial de la tabla ARP del sistema operativo
             Map<String, String> initialArpTable = getFullArpTable();
+
+            String ioTag = String.format(" [%s: X1*=%.0f pps, X2*=%.0f pps, Z*=%.1f]",
+                    rateLimiter.getModoOperacion(),
+                    rateLimiter.getX1RatePps(),
+                    rateLimiter.getX2RatePps(),
+                    rateLimiter.getZMaximo());
 
             // Notificar inicio del escaneo por WebSocket
             ScanMessage startMsg = ScanMessage.scanStart(
@@ -166,12 +178,33 @@ public class LocalNetworkScannerService {
                     subnetInfo.gatewayIp,
                     subnetInfo.subnetCidr,
                     totalHosts,
-                    "Iniciando escaneo concurrente en la subred " + subnetInfo.subnetCidr
+                    "Iniciando escaneo optimizado en " + subnetInfo.subnetCidr + ioTag
             );
             messagingTemplate.convertAndSend("/topic/scan", startMsg);
 
-            // 2. Ejecutor concurrente con pool de hilos de alta velocidad
-            int poolSize = Math.max(20, Math.min(threadPoolSize, 50));
+            // 2. Ejecutor concurrente adaptativo según el perfil activo de I.O.
+            // Emula el comportamiento de perfiles de ciberseguridad (Sigiloso ~12s, Balanceado ~5s, Agresivo ~2.5s)
+            double x1 = rateLimiter.getX1RatePps();
+            double x2 = rateLimiter.getX2RatePps();
+            double totalPps = x1 + x2;
+
+            int poolSize;
+            int effectivePingTimeoutMs;
+
+            if (totalPps <= 60.0) {
+                // Modo Sigiloso (<=50 pps): baja concurrencia y timeout paciente para evitar alertar al router
+                poolSize = 12;
+                effectivePingTimeoutMs = 500;
+            } else if (totalPps >= 180.0) {
+                // Modo Agresivo (>=200 pps): máxima concurrencia y timeouts ultra rápidos para barrido en laboratorios
+                poolSize = 50;
+                effectivePingTimeoutMs = 180;
+            } else {
+                // Modo Balanceado (~100 pps): punto medio óptimo estándar
+                poolSize = 28;
+                effectivePingTimeoutMs = 350;
+            }
+
             scanExecutor = Executors.newFixedThreadPool(poolSize);
 
             AtomicInteger completedCount = new AtomicInteger(0);
@@ -183,7 +216,7 @@ public class LocalNetworkScannerService {
             for (String targetIp : subnetInfo.ipList) {
                 CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                     try {
-                        auditHost(targetIp, subnetInfo, initialArpTable, foundCount, discoveredDevices);
+                        auditHost(targetIp, subnetInfo, initialArpTable, foundCount, discoveredDevices, effectivePingTimeoutMs);
                     } catch (Exception e) {
                         System.err.println("[SCANNER] Error auditando IP " + targetIp + ": " + e.getMessage());
                     } finally {
@@ -203,15 +236,18 @@ public class LocalNetworkScannerService {
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
             long totalTimeSec = (System.currentTimeMillis() - startTime) / 1000;
-            System.out.println(String.format("[SCANNER] Escaneo finalizado en %ds. Dispositivos activos: %d/%d",
-                    totalTimeSec, foundCount.get(), totalHosts));
+            System.out.println(String.format(
+                    "[SCANNER] Escaneo finalizado en %ds. Dispositivos activos: %d/%d | Sondeos I.O. regulados -> Críticos: %d, Comunes: %d",
+                    totalTimeSec, foundCount.get(), totalHosts,
+                    rateLimiter.getCriticalPacketsSent(), rateLimiter.getCommonPacketsSent()));
 
             // Emitir evento de finalización
             ScanMessage completeMsg = ScanMessage.scanComplete(
                     totalTimeSec,
                     foundCount.get(),
                     totalHosts,
-                    "Auditoría completada exitosamente."
+                    String.format("Auditoría completada con Rate Limiter I.O. (X1*=%.0f pps, X2*=%.0f pps).",
+                            rateLimiter.getX1RatePps(), rateLimiter.getX2RatePps())
             );
             messagingTemplate.convertAndSend("/topic/scan", completeMsg);
 
@@ -303,7 +339,7 @@ public class LocalNetworkScannerService {
      * Audita un host específico de forma no intrusiva y emite el resultado si responde.
      */
     private void auditHost(String targetIp, SubnetInfo subnetInfo, Map<String, String> initialArpTable,
-                           AtomicInteger foundCount, List<ScanMessage> discoveredDevices) {
+                           AtomicInteger foundCount, List<ScanMessage> discoveredDevices, int pingTimeout) {
         boolean isLocalHost = targetIp.equals(subnetInfo.localIp);
         boolean isReachable = false;
         Long latencyMs = null;
@@ -315,7 +351,7 @@ public class LocalNetworkScannerService {
             ttl = System.getProperty("os.name").toLowerCase().contains("win") ? 128 : 64;
         } else {
             // Intento 1: Ping ICMP nativo del SO para capturar disponibilidad, latencia y TTL
-            PingResult pingResult = executePing(targetIp, pingTimeoutMs);
+            PingResult pingResult = executePing(targetIp, pingTimeout);
             if (pingResult.reachable) {
                 isReachable = true;
                 ttl = pingResult.ttl;
@@ -326,11 +362,11 @@ public class LocalNetworkScannerService {
                     isReachable = true;
                     latencyMs = 1L;
                 } else {
-                    // Intento 3: Sondeo rápido a puertos estándar para forzar actualización de ARP
+                    // Intento 3: Sondeo rápido a puertos estándar para forzar actualización de ARP en hosts que silencian ICMP
                     long probeStart = System.currentTimeMillis();
-                    if (isPortOpen(targetIp, 80, 150) || isPortOpen(targetIp, 445, 150)) {
+                    if (isDiscoveryProbeOpen(targetIp, 80, 100) || isDiscoveryProbeOpen(targetIp, 445, 100)) {
                         isReachable = true;
-                        latencyMs = System.currentTimeMillis() - probeStart;
+                        latencyMs = Math.max(1L, System.currentTimeMillis() - probeStart);
                     }
                 }
             }
@@ -554,7 +590,25 @@ public class LocalNetworkScannerService {
         return openPorts;
     }
 
+    /**
+     * Sondeo rápido y ligero sin encolamiento en el Rate Limiter de auditoría para
+     * despertar la tabla ARP en hosts que silencian ICMP ping, evitando retrasar
+     * la verificación de IPs inactivas.
+     */
+    private boolean isDiscoveryProbeOpen(String ip, int port, int timeoutMs) {
+        try (Socket socket = new Socket()) {
+            socket.setReuseAddress(true);
+            socket.setTcpNoDelay(true);
+            socket.connect(new InetSocketAddress(ip, port), timeoutMs);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private boolean isPortOpen(String ip, int port, int timeoutMs) {
+        // Regulación adaptativa mediante Investigación de Operaciones (X1* para críticos, X2* para comunes)
+        rateLimiter.acquirePermitForPort(port);
         try (Socket socket = new Socket()) {
             socket.setReuseAddress(true);
             socket.setTcpNoDelay(true);

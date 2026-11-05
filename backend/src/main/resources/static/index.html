@@ -1877,6 +1877,766 @@
             letter-spacing: 1px;
         }
 
+
+        /* ==========================================================
+           PANEL INTERACTIVO DE INVESTIGACIÓN DE OPERACIONES (I.O.)
+           ========================================================== */
+        .io-panel-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 212, 255, 0.24);
+            border-radius: 20px;
+            padding: 17px 22px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), inset 0 0 24px rgba(0, 212, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .io-panel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 5%, #0284c7 25%, #00d4ff 55%, #6366f1 82%, transparent 96%);
+        }
+
+        .io-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: nowrap;
+        }
+
+        .io-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .io-title-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.16), rgba(99, 102, 241, 0.16));
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .io-title-text {
+            min-width: 0;
+        }
+
+        .io-title-text h2 {
+            font-size: 0.98rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .io-title-text p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .io-header-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 9px;
+            flex-shrink: 0;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        .io-engine-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 11px;
+            border-radius: 999px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            border: 1px solid rgba(16, 185, 129, 0.38);
+            background: rgba(16, 185, 129, 0.11);
+            color: #6ee7b7;
+        }
+
+        .io-engine-pill.fallback {
+            border-color: rgba(234, 179, 8, 0.4);
+            background: rgba(234, 179, 8, 0.12);
+            color: #fde047;
+        }
+
+        .io-engine-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .io-engine-pill.fallback .io-engine-dot {
+            background: #eab308;
+            box-shadow: 0 0 8px #eab308;
+        }
+
+        /* Botón "Mostrar controles de I.O." con efecto Aurora Azul en la paleta de VulneraSolve */
+        .io-collapse-btn {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            background: linear-gradient(
+                125deg,
+                rgba(2, 132, 199, 0.42) 0%,
+                rgba(0, 212, 255, 0.48) 26%,
+                rgba(56, 189, 248, 0.28) 50%,
+                rgba(99, 102, 241, 0.44) 74%,
+                rgba(0, 212, 255, 0.46) 100%
+            );
+            background-size: 280% 280%;
+            animation: ioAuroraShift 5.5s ease-in-out infinite;
+            border: 1px solid rgba(56, 189, 248, 0.68);
+            color: #f0f9ff;
+            padding: 7px 14px;
+            border-radius: 11px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.15px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            box-shadow:
+                0 0 18px rgba(0, 212, 255, 0.28),
+                0 0 32px rgba(99, 102, 241, 0.18),
+                inset 0 0 14px rgba(0, 212, 255, 0.18);
+            text-shadow: 0 1px 8px rgba(0, 212, 255, 0.35);
+            transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* Velo luminoso de aurora boreal que ondula suavemente sobre el botón */
+        .io-collapse-btn::before {
+            content: '';
+            position: absolute;
+            inset: -45% -25%;
+            z-index: -1;
+            background:
+                radial-gradient(ellipse at 25% 50%, rgba(0, 212, 255, 0.48) 0%, transparent 58%),
+                radial-gradient(ellipse at 75% 45%, rgba(99, 102, 241, 0.44) 0%, transparent 58%),
+                radial-gradient(ellipse at 50% 80%, rgba(56, 189, 248, 0.35) 0%, transparent 60%);
+            filter: blur(8px);
+            animation: ioAuroraVeil 4.4s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .io-collapse-btn:hover {
+            transform: translateY(-1.5px);
+            border-color: #00d4ff;
+            color: #ffffff;
+            box-shadow:
+                0 4px 22px rgba(0, 212, 255, 0.46),
+                0 0 38px rgba(56, 189, 248, 0.28),
+                inset 0 0 16px rgba(0, 212, 255, 0.28);
+        }
+
+        .io-collapse-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Cuando el panel está abierto, el botón conserva la estética aurora pero más serena */
+        .io-panel-card:not(.collapsed) .io-collapse-btn {
+            background: linear-gradient(
+                125deg,
+                rgba(2, 132, 199, 0.24) 0%,
+                rgba(0, 212, 255, 0.26) 45%,
+                rgba(99, 102, 241, 0.26) 100%
+            );
+            background-size: 240% 240%;
+            border-color: rgba(56, 189, 248, 0.45);
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.16), inset 0 0 10px rgba(0, 212, 255, 0.1);
+        }
+
+        .io-collapse-chevron {
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
+        }
+
+        .io-panel-card:not(.collapsed) .io-collapse-chevron {
+            transform: rotate(180deg);
+        }
+
+        @keyframes ioAuroraShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes ioAuroraVeil {
+            0% { transform: translate3d(-8%, -4%, 0) scale(1); opacity: 0.72; }
+            50% { transform: translate3d(6%, 5%, 0) scale(1.08); opacity: 1; }
+            100% { transform: translate3d(10%, -3%, 0) scale(0.96); opacity: 0.78; }
+        }
+
+        .io-collapsed-summary {
+            display: none;
+            font-size: 0.71rem;
+            color: #7dd3fc;
+            background: rgba(0, 212, 255, 0.09);
+            border: 1px solid rgba(56, 189, 248, 0.26);
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .io-panel-card.collapsed .io-collapsed-summary {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .io-panel-card.collapsed .io-panel-body {
+            display: none;
+        }
+
+        .io-panel-body {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(56, 189, 248, 0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            animation: fadeInUp 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ==========================================================
+           ICONO MINIMALISTA "?" (TONO AZUL PIZARRA TRASLÚCIDO) Y
+           VENTANITAS EMERGENTES INDIVIDUALES DE EXPLICACIÓN CLARA
+           ========================================================== */
+        .io-help-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 800;
+            line-height: 1;
+            color: #7da6c8;
+            background: rgba(56, 189, 248, 0.07);
+            border: 1px solid rgba(56, 189, 248, 0.24);
+            cursor: pointer;
+            user-select: none;
+            flex-shrink: 0;
+            vertical-align: middle;
+            transition: all 0.18s ease;
+        }
+
+        .io-help-btn:hover,
+        .io-help-btn:focus-visible {
+            color: #e0f2fe;
+            background: rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 248, 0.6);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.32);
+            transform: scale(1.08);
+            outline: none;
+        }
+
+        .io-help-btn.active {
+            color: #04111d;
+            background: #38bdf8;
+            border-color: #00d4ff;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.55);
+            transform: scale(1.08);
+        }
+
+        .io-inline-with-help {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Ventanita emergente individual por cada apartado */
+        .io-help-popover {
+            position: fixed;
+            z-index: 10005;
+            width: 348px;
+            max-width: calc(100vw - 28px);
+            background: rgba(11, 18, 34, 0.98);
+            border: 1px solid rgba(56, 189, 248, 0.42);
+            border-radius: 15px;
+            box-shadow:
+                0 18px 46px rgba(0, 0, 0, 0.72),
+                0 0 24px rgba(0, 212, 255, 0.14);
+            backdrop-filter: blur(18px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(6px) scale(0.97);
+            transition:
+                opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.18s;
+            overflow: hidden;
+        }
+
+        .io-help-popover.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        .io-help-popover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0284c7, #00d4ff, #6366f1);
+        }
+
+        .io-help-pop-header {
+            padding: 12px 15px 10px 15px;
+            background: rgba(56, 189, 248, 0.05);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .io-help-pop-tag {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #38bdf8;
+            margin-bottom: 2px;
+        }
+
+        .io-help-pop-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #f8fafc;
+            line-height: 1.25;
+        }
+
+        .io-help-close {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .io-help-close:hover {
+            background: rgba(239, 68, 68, 0.18);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+
+        .io-help-pop-body {
+            padding: 13px 15px 14px 15px;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .io-help-pop-body strong {
+            color: #f1f5f9;
+        }
+
+        .io-help-tip {
+            background: rgba(0, 212, 255, 0.06);
+            border-left: 2.5px solid #38bdf8;
+            border-radius: 7px;
+            padding: 8px 10px;
+            font-size: 0.76rem;
+            color: #bae6fd;
+            line-height: 1.42;
+        }
+
+        .io-presets-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .io-presets-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .io-modes-label {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 2px;
+        }
+
+        .io-presets-group {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .io-preset-btn {
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 13px;
+            border-radius: 11px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .io-preset-btn .io-mode-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #38bdf8;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .io-preset-btn:hover {
+            border-color: rgba(0, 212, 255, 0.45);
+            color: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        .io-preset-btn:hover .io-mode-icon {
+            transform: scale(1.08);
+        }
+
+        .io-preset-btn.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(99, 102, 241, 0.22));
+            border-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 0 16px rgba(0, 212, 255, 0.22);
+        }
+
+        .io-preset-btn.active .io-mode-icon {
+            color: #00d4ff;
+        }
+
+        .io-formula-badge {
+            font-size: 0.78rem;
+            color: #cbd5e1;
+            background: rgba(6, 11, 20, 0.75);
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            padding: 7px 12px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .io-weights-btn {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            border-radius: 6px;
+            padding: 3px 9px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.18s ease, border-color 0.18s ease;
+        }
+
+        .io-weights-btn:hover {
+            background: rgba(56, 189, 248, 0.22);
+            border-color: rgba(56, 189, 248, 0.5);
+        }
+
+        .io-grid {
+            display: grid;
+            grid-template-columns: 1.12fr 1fr;
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .io-sliders-box {
+            background: rgba(11, 15, 25, 0.55);
+            border: 1px solid rgba(56, 189, 248, 0.13);
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .io-slider-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .io-slider-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .io-slider-label {
+            font-size: 0.83rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .io-slider-val {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.28);
+            padding: 2px 10px;
+            border-radius: 7px;
+        }
+
+        .io-range {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .io-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.75);
+            cursor: pointer;
+            border: 2px solid #04111d;
+            transition: transform 0.15s ease;
+        }
+
+        .io-range::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .io-slider-hint {
+            font-size: 0.74rem;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .io-weights-drawer {
+            display: none;
+            margin-top: 4px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(56, 189, 248, 0.2);
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .io-weights-drawer.open {
+            display: flex;
+        }
+
+        .io-weight-field {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .io-weight-input {
+            width: 68px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 7px;
+            padding: 4px 8px;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .io-results-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .io-metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .io-metric-card {
+            background: rgba(11, 15, 25, 0.65);
+            border: 1px solid rgba(56, 189, 248, 0.16);
+            border-radius: 14px;
+            padding: 13px 15px;
+            transition: border-color 0.25s ease;
+        }
+
+        .io-metric-card.highlight-z {
+            border-color: rgba(16, 185, 129, 0.38);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(11, 15, 25, 0.7));
+        }
+
+        .io-metric-label {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .io-metric-val {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .io-metric-sub {
+            font-size: 0.72rem;
+            color: var(--text-dark);
+            margin-top: 4px;
+        }
+
+        .io-vertices-strip {
+            background: rgba(6, 11, 20, 0.7);
+            border: 1px solid rgba(56, 189, 248, 0.14);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .io-vertices-title {
+            font-size: 0.73rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .io-vertices-chips {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .io-vertex-chip {
+            font-size: 0.72rem;
+            padding: 3px 9px;
+            border-radius: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94a3b8;
+        }
+
+        .io-vertex-chip.optimal {
+            background: rgba(16, 185, 129, 0.16);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: #6ee7b7;
+            font-weight: 700;
+        }
+
+        .io-explanation-bar {
+            font-size: 0.78rem;
+            color: #cbd5e1;
+            line-height: 1.48;
+            padding: 10px 13px;
+            border-radius: 11px;
+            background: rgba(0, 212, 255, 0.055);
+            border: 1px solid rgba(56, 189, 248, 0.14);
+            border-left: 3px solid var(--primary);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        @media (max-width: 960px) {
+            .io-grid {
+                grid-template-columns: 1fr;
+            }
+            .io-panel-header {
+                flex-wrap: wrap;
+            }
+            .io-header-controls {
+                margin-left: 0;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             body { padding: 12px; }
@@ -1980,6 +2740,239 @@
                 Sistema listo para auditar el segmento de red.
             </div>
         </div>
+
+
+        <!-- Panel Interactivo de Optimización en Investigación de Operaciones (Microservicio Python + Rate Limiter Java) -->
+        <section class="io-panel-card collapsed" id="ioPanelCard">
+            <div class="io-panel-header">
+                <div class="io-title-group">
+                    <div class="io-title-icon">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" y1="21" x2="4" y2="14"/>
+                            <line x1="4" y1="10" x2="4" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12" y2="3"/>
+                            <line x1="20" y1="21" x2="20" y2="16"/>
+                            <line x1="20" y1="12" x2="20" y2="3"/>
+                            <line x1="1" y1="14" x2="7" y2="14"/>
+                            <line x1="9" y1="8" x2="15" y2="8"/>
+                            <line x1="17" y1="16" x2="23" y2="16"/>
+                        </svg>
+                    </div>
+                    <div class="io-title-text">
+                        <h2>
+                            <span>Optimización adaptativa de tráfico (Investigación de Operaciones)</span>
+                            <span class="io-collapsed-summary mono" id="ioCollapsedSummary" title="pps = paquetes por segundo">50 + 50 pps &bull; 1.20 Mbps &bull; 125 pts</span>
+                        </h2>
+                        <p>Ajusta automáticamente la velocidad del escáner para detectar más riesgos sin poner lenta tu red ni activar bloqueos</p>
+                    </div>
+                </div>
+
+                <div class="io-header-controls">
+                    <div class="io-engine-pill" id="ioEngineBadge" title="Estado del motor matemático en Python (puerto 8001)">
+                        <span class="io-engine-dot"></span>
+                        <span id="ioEngineText">Microservicio Python &bull; Conectando...</span>
+                    </div>
+                    <button type="button" class="io-collapse-btn" onclick="toggleIoPanel()" id="ioCollapseBtn">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3l1.9 3.9L18 8.8l-3 2.9.7 4.3L12 14l-3.7 2 .7-4.3-3-2.9 4.1-1.9L12 3z"/>
+                        </svg>
+                        <span id="ioCollapseLabel">Mostrar controles de I.O.</span>
+                        <svg class="io-collapse-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="io-panel-body" id="ioPanelBody">
+                <div class="io-presets-bar">
+                    <div class="io-presets-left">
+                        <span class="io-modes-label">
+                            <span>Modos de escaneo:</span>
+                            <span role="button" tabindex="0" class="io-help-btn" title="Comparar los 3 modos de escaneo" onclick="toggleIoHelp('ioHelp_comparativa_modos', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_comparativa_modos', this, event)}">?</span>
+                        </span>
+
+                        <div class="io-presets-group">
+                            <button type="button" class="io-preset-btn" id="presetSigiloso" onclick="applyIoPreset('sigiloso')">
+                                <span class="io-mode-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                        <path d="M9.5 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 1 0-5 0"/>
+                                    </svg>
+                                </span>
+                                <span>Modo Sigiloso</span>
+                                <span role="button" tabindex="0" class="io-help-btn" title="¿Cuándo usar el Modo Sigiloso?" onclick="toggleIoHelp('ioHelp_modo_sigiloso', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_modo_sigiloso', this, event)}">?</span>
+                            </button>
+
+                            <button type="button" class="io-preset-btn active" id="presetBalanceado" onclick="applyIoPreset('balanceado')">
+                                <span class="io-mode-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 3v18"/>
+                                        <path d="M5 7h14"/>
+                                        <path d="M5 7l-3 6h6l-3-6z"/>
+                                        <path d="M19 7l-3 6h6l-3-6z"/>
+                                        <path d="M8 21h8"/>
+                                    </svg>
+                                </span>
+                                <span>Modo Balanceado</span>
+                                <span role="button" tabindex="0" class="io-help-btn" title="¿Por qué es el modo recomendado?" onclick="toggleIoHelp('ioHelp_modo_balanceado', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_modo_balanceado', this, event)}">?</span>
+                            </button>
+
+                            <button type="button" class="io-preset-btn" id="presetAgresivo" onclick="applyIoPreset('agresivo')">
+                                <span class="io-mode-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                                    </svg>
+                                </span>
+                                <span>Modo Agresivo</span>
+                                <span role="button" tabindex="0" class="io-help-btn" title="¿Cuándo usar el Modo Agresivo?" onclick="toggleIoHelp('ioHelp_modo_agresivo', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_modo_agresivo', this, event)}">?</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="io-formula-badge mono">
+                        <span class="io-inline-with-help">
+                            <span id="ioObjectiveFormula">Max Z = 1.5(X₁) + 1.0(X₂)</span>
+                            <span role="button" tabindex="0" class="io-help-btn" title="¿Qué significa esta fórmula?" onclick="toggleIoHelp('ioHelp_formula_z', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_formula_z', this, event)}">?</span>
+                        </span>
+                        <span class="io-inline-with-help">
+                            <button type="button" class="io-weights-btn" onclick="toggleIoWeightsDrawer()">
+                                <span>Pesos c₁ / c₂</span>
+                            </button>
+                            <span role="button" tabindex="0" class="io-help-btn" title="¿Para qué sirven los pesos c1 y c2?" onclick="toggleIoHelp('ioHelp_pesos', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_pesos', this, event)}">?</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="io-grid">
+                    <!-- Columna Izquierda: Sliders de Restricciones -->
+                    <div class="io-sliders-box">
+                        <div class="io-slider-item">
+                            <div class="io-slider-top">
+                                <span class="io-slider-label">
+                                    <span>1. Tolerancia del IDS / Firewall (R₁)</span>
+                                    <span role="button" tabindex="0" class="io-help-btn" title="Explicación sencilla de Tolerancia del Firewall" onclick="toggleIoHelp('ioHelp_tolerancia_ids', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_tolerancia_ids', this, event)}">?</span>
+                                </span>
+                                <span class="io-slider-val mono" id="ioValIds" title="pps = paquetes por segundo">100 pps</span>
+                            </div>
+                            <input type="range" class="io-range" id="ioSliderIds" min="20" max="300" step="5" value="100" oninput="onIoSliderInput()">
+                            <div class="io-slider-hint">
+                                <span><strong>pps</strong> = paquetes por segundo enviados</span>
+                                <span class="mono" id="ioEqR1">X₁ + X₂ ≤ 100 pps</span>
+                            </div>
+                        </div>
+
+                        <div class="io-slider-item">
+                            <div class="io-slider-top">
+                                <span class="io-slider-label">
+                                    <span>2. Límite de Ancho de Banda LAN (R₂)</span>
+                                    <span role="button" tabindex="0" class="io-help-btn" title="Explicación sencilla de Ancho de Banda" onclick="toggleIoHelp('ioHelp_ancho_banda', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_ancho_banda', this, event)}">?</span>
+                                </span>
+                                <span class="io-slider-val mono" id="ioValBw">150 KB/s (~1.20 Mbps)</span>
+                            </div>
+                            <input type="range" class="io-range" id="ioSliderBw" min="40" max="800" step="5" value="150" oninput="onIoSliderInput()">
+                            <div class="io-slider-hint">
+                                <span>Peligroso: 2 KB/paquete &bull; Normal: 1 KB/paquete</span>
+                                <span class="mono" id="ioEqR2">2.0X₁ + 1.0X₂ ≤ 150 KB/s</span>
+                            </div>
+                        </div>
+
+                        <div class="io-slider-item">
+                            <div class="io-slider-top">
+                                <span class="io-slider-label">
+                                    <span>3. Enfoque mínimo en Puertos Críticos (R₃)</span>
+                                    <span role="button" tabindex="0" class="io-help-btn" title="Explicación sencilla de Enfoque Mínimo" onclick="toggleIoHelp('ioHelp_enfoque_critico', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_enfoque_critico', this, event)}">?</span>
+                                </span>
+                                <span class="io-slider-val mono" id="ioValCrit">40%</span>
+                            </div>
+                            <input type="range" class="io-range" id="ioSliderCrit" min="20" max="80" step="5" value="40" oninput="onIoSliderInput()">
+                            <div class="io-slider-hint">
+                                <span>Asegura atención en puertos 21, 23, 445 y 3389</span>
+                                <span class="mono" id="ioEqR3">X₂ ≤ 1.50 X₁</span>
+                            </div>
+                        </div>
+
+                        <!-- Cajón opcional para análisis de sensibilidad de pesos c1 y c2 -->
+                        <div class="io-weights-drawer" id="ioWeightsDrawer">
+                            <div class="io-weight-field">
+                                <label for="ioInputC1">Importancia críticos (c₁):</label>
+                                <input type="number" id="ioInputC1" class="io-weight-input" min="0.5" max="10" step="0.1" value="1.5" oninput="onIoSliderInput()">
+                            </div>
+                            <div class="io-weight-field">
+                                <label for="ioInputC2">Importancia comunes (c₂):</label>
+                                <input type="number" id="ioInputC2" class="io-weight-input" min="0.5" max="10" step="0.1" value="1.0" oninput="onIoSliderInput()">
+                            </div>
+                            <button type="button" class="io-weights-btn" onclick="resetIoWeights()">Restaurar 1.5 / 1.0</button>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Resultados Óptimos Calculados por Python -->
+                    <div class="io-results-box">
+                        <div class="io-metrics-grid">
+                            <div class="io-metric-card">
+                                <div class="io-metric-label">
+                                    <span>Tasa óptima críticos (X₁*)</span>
+                                    <span role="button" tabindex="0" class="io-help-btn" title="¿Qué indica la tasa óptima de puertos críticos?" onclick="toggleIoHelp('ioHelp_tasa_x1', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_tasa_x1', this, event)}">?</span>
+                                </div>
+                                <div class="io-metric-val mono" style="color: var(--primary);" id="ioOutX1" title="pps = paquetes por segundo">50 pps</div>
+                                <div class="io-metric-sub">paquetes/s &bull; FTP (21), Telnet (23), SMB (445), RDP (3389)</div>
+                            </div>
+
+                            <div class="io-metric-card">
+                                <div class="io-metric-label">
+                                    <span>Tasa óptima comunes (X₂*)</span>
+                                    <span role="button" tabindex="0" class="io-help-btn" title="¿Qué indica la tasa óptima de puertos comunes?" onclick="toggleIoHelp('ioHelp_tasa_x2', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_tasa_x2', this, event)}">?</span>
+                                </div>
+                                <div class="io-metric-val mono" style="color: #818cf8;" id="ioOutX2" title="pps = paquetes por segundo">50 pps</div>
+                                <div class="io-metric-sub">paquetes/s &bull; SSH (22), DNS (53), Web (80, 443, 8080)</div>
+                            </div>
+
+                            <div class="io-metric-card highlight-z">
+                                <div class="io-metric-label">
+                                    <span>Efectividad máxima (Z*)</span>
+                                    <span role="button" tabindex="0" class="io-help-btn" title="¿Qué significa el puntaje de efectividad máxima?" onclick="toggleIoHelp('ioHelp_efectividad_z', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_efectividad_z', this, event)}">?</span>
+                                </div>
+                                <div class="io-metric-val mono" style="color: #34d399;" id="ioOutZ">125 pts</div>
+                                <div class="io-metric-sub" id="ioOutInterseccion">Equilibrio ideal entre firewall y red</div>
+                            </div>
+
+                            <div class="io-metric-card">
+                                <div class="io-metric-label">
+                                    <span>Tráfico y uso de recursos</span>
+                                    <span role="button" tabindex="0" class="io-help-btn" title="¿Cuánto internet y margen consume el escáner?" onclick="toggleIoHelp('ioHelp_trafico_recursos', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_trafico_recursos', this, event)}">?</span>
+                                </div>
+                                <div class="io-metric-val mono" style="font-size: 1.18rem; color: #38bdf8;" id="ioOutBwUsed">150 KB/s (~1.20 Mbps)</div>
+                                <div class="io-metric-sub" id="ioOutResourcePct">Margen firewall: 100% &bull; Atención crítica: 50%</div>
+                            </div>
+                        </div>
+
+                        <div class="io-vertices-strip">
+                            <div class="io-vertices-title">
+                                <span class="io-inline-with-help">
+                                    <span>Vértices factibles evaluados</span>
+                                    <span role="button" tabindex="0" class="io-help-btn" title="¿Qué son estos vértices evaluados?" onclick="toggleIoHelp('ioHelp_vertices', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_vertices', this, event)}">?</span>
+                                </span>
+                                <span class="mono" style="color: var(--primary);" id="ioModeLabel">Modo Balanceado</span>
+                            </div>
+                            <div class="io-vertices-chips mono" id="ioVerticesChips">
+                                <span class="io-vertex-chip">(0, 0) → Z=0</span>
+                                <span class="io-vertex-chip">(40, 60) → Z=120</span>
+                                <span class="io-vertex-chip optimal">★ (50, 50) → Z=125</span>
+                                <span class="io-vertex-chip">(75, 0) → Z=112.5</span>
+                            </div>
+                        </div>
+
+                        <div class="io-explanation-bar">
+                            <span id="ioExplanationText">
+                                En resumen: el escáner enviará 50 pps (paquetes por segundo) a puertos peligrosos y 50 pps a puertos normales (100 pps en total). Así consigue el mejor aprovechamiento posible (125 puntos de efectividad) ocupando apenas 150 KB/s (1.20 Mbps) de tu red local, sin poner lento el internet ni provocar bloqueos del firewall (100% del margen seguro).
+                            </span>
+                            <span role="button" tabindex="0" class="io-help-btn" title="¿Cómo leer este resumen?" onclick="toggleIoHelp('ioHelp_resumen', this, event)" onkeydown="if(event.key==='Enter'||event.key===' '){toggleIoHelp('ioHelp_resumen', this, event)}">?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Tarjetas de Métricas KPI con Micro-Animaciones -->
         <div class="kpi-grid">
@@ -2235,6 +3228,233 @@
     </div>
 
     <!-- ==========================================================
+         15 VENTANITAS EMERGENTES INDIVIDUALES DEL PANEL DE I.O.
+         (Cada apartado cuenta con su propia ventana explicativa clara)
+         ========================================================== -->
+    <div id="ioHelp_comparativa_modos" class="io-help-popover" role="dialog" aria-label="Comparación entre modos de escaneo">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Comparativa de perfiles</div>
+                <div class="io-help-pop-title">Diferencia entre los 3 modos de escaneo</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Son tres botones rápidos que ajustan todas las barras por ti según dónde estés trabajando:</p>
+            <p>&bull; <strong>Sigiloso:</strong> Va despacio (50 pps = 50 paquetes por segundo) y casi no gasta red. Ideal en oficinas con videollamadas o firewalls estrictos.<br>
+               &bull; <strong>Balanceado:</strong> Punto medio ideal (100 pps). Rápido, seguro y ligero para el día a día.<br>
+               &bull; <strong>Agresivo:</strong> Doble de velocidad (200 pps). Ideal para laboratorios o pruebas cuando tienes prisa.</p>
+            <div class="io-help-tip"><strong>Consejo:</strong> Si no sabes cuál elegir, usa <strong>Modo Balanceado</strong> o pulsa <strong>Autocalibrar</strong>.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_modo_sigiloso" class="io-help-popover" role="dialog" aria-label="Explicación de Modo Sigiloso">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Perfil discreto</div>
+                <div class="io-help-pop-title">Modo Sigiloso (Red sensible)</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Hace que el escáner trabaje "caminando en silencio": envía máximo <strong>50 paquetes por segundo (pps)</strong> y ocupa solo <strong>80 KB/s (0.64 Mbps)</strong> de red.</p>
+            <p>Además, dedica al menos la mitad del esfuerzo a buscar las amenazas más peligrosas primero.</p>
+            <div class="io-help-tip"><strong>¿Cuándo usarlo?</strong> En empresas en pleno horario laboral o redes con firewalls muy estrictos.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_modo_balanceado" class="io-help-popover" role="dialog" aria-label="Explicación de Modo Balanceado">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Perfil estándar</div>
+                <div class="io-help-pop-title">Modo Balanceado (Recomendado)</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Es el equilibrio ideal entre <strong>buena velocidad y cero molestias</strong>. Reparte el envío mitad y mitad: 50 paquetes por segundo (pps) a puertos peligrosos y 50 pps a puertos normales.</p>
+            <p>Usa apenas <strong>1.20 Mbps</strong> de red local, así que nadie notará lentitud mientras auditas.</p>
+            <div class="io-help-tip"><strong>¿Cuándo usarlo?</strong> En la mayoría de hogares, oficinas pequeñas y redes académicas normales.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_modo_agresivo" class="io-help-popover" role="dialog" aria-label="Explicación de Modo Agresivo">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Perfil rápido</div>
+                <div class="io-help-pop-title">Modo Agresivo (Laboratorio)</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Acelera el escáner al doble del ritmo estándar (<strong>200 paquetes por segundo</strong> y hasta <strong>2.40 Mbps</strong>) para terminar toda la revisión en el menor tiempo posible.</p>
+            <div class="io-help-tip"><strong>¿Cuándo usarlo?</strong> En redes de prueba, laboratorios o mantenimientos nocturnos autorizados.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_formula_z" class="io-help-popover" role="dialog" aria-label="Explicación de la fórmula Max Z">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Meta del cálculo</div>
+                <div class="io-help-pop-title">¿Qué significa Max Z = 1.5(X₁) + 1.0(X₂)?</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Imagina que el escáner suma puntos de utilidad por cada paquete de revisión que logra enviar cada segundo:</p>
+            <p>&bull; Cada paquete hacia un <strong>puerto peligroso (X₁)</strong> vale <strong>1.5 puntos</strong> porque hallar un fallo ahí es urgente.<br>
+               &bull; Cada paquete hacia un <strong>puerto común (X₂)</strong> vale <strong>1.0 punto</strong>.</p>
+            <div class="io-help-tip"><strong>En palabras simples:</strong> "Max Z" significa encontrar el ritmo que consiga el <strong>puntaje total más alto</strong> sin romper tus límites.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_pesos" class="io-help-popover" role="dialog" aria-label="Explicación de los pesos c1 y c2">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Prioridad personalizable</div>
+                <div class="io-help-pop-title">¿Qué son los Pesos c₁ / c₂?</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Son la <strong>importancia</strong> que le das a cada grupo de puertos. Por defecto, <strong>1.5 y 1.0</strong> indican que revisar un puerto peligroso te importa un 50% más que uno común.</p>
+            <p>Al pulsar el botón <strong>Pesos c₁ / c₂</strong> puedes ajustarlos libremente si deseas cambiar esa prioridad.</p>
+            <div class="io-help-tip"><strong>Ejemplo:</strong> Si subes <strong>c₁ a 3.0</strong>, el motor volcará mucha más velocidad hacia los puertos críticos.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_tolerancia_ids" class="io-help-popover" role="dialog" aria-label="Explicación de Tolerancia del IDS y Firewall">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Restricción 1</div>
+                <div class="io-help-pop-title">1. Tolerancia del IDS / Firewall</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Los firewalls tienen una alarma (IDS) que bloquea a cualquier equipo que envíe demasiadas pruebas de golpe.</p>
+            <p>Aquí eliges el tope seguro en <strong>pps (paquetes por segundo)</strong>: cada paquete es una pequeña revisión a un puerto. Mantenerte bajo este límite evita que el router te bloquee.</p>
+            <div class="io-help-tip"><strong>Regla práctica:</strong> Usa valores bajos (50 pps) en redes vigiladas o más altos (150–200 pps) en redes propias.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_ancho_banda" class="io-help-popover" role="dialog" aria-label="Explicación de Límite de Ancho de Banda">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Restricción 2</div>
+                <div class="io-help-pop-title">2. Límite de Ancho de Banda LAN</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Es el máximo de velocidad de tu red local que le das permiso de usar al escáner para no afectar a otros usuarios.</p>
+            <p>Se muestra en <strong>KB/s</strong> (peso de los paquetes enviados) y su equivalente en <strong>Mbps</strong> (igual que la velocidad de tu internet). Si no sabes cuánto poner, usa el botón <strong>Autocalibrar</strong>.</p>
+            <div class="io-help-tip"><strong>Para comparar:</strong> 150 KB/s equivalen a solo <strong>1.20 Mbps</strong>; menos que un video en calidad baja.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_enfoque_critico" class="io-help-popover" role="dialog" aria-label="Explicación de Enfoque mínimo en puertos críticos">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Restricción 3</div>
+                <div class="io-help-pop-title">3. Enfoque mínimo en Puertos Críticos</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Como los puertos comunes pesan la mitad que los peligrosos, sin esta regla el sistema podría tentarse a enviar solo paquetes ligeros.</p>
+            <p>Este porcentaje obliga al escáner a dedicar como mínimo esa parte de sus paquetes (ej. <strong>40%</strong>) a inspeccionar los puertos más riesgosos.</p>
+            <div class="io-help-tip"><strong>Puertos vigilados aquí:</strong> Carpetas compartidas SMB (445), Escritorio Remoto (3389), Telnet (23) y FTP (21).</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_tasa_x1" class="io-help-popover" role="dialog" aria-label="Explicación de Tasa óptima críticos">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Resultado calculado</div>
+                <div class="io-help-pop-title">Tasa óptima críticos (X₁*)</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Indica cuántos <strong>pps (paquetes por segundo)</strong> enviará el escáner para revisar los 4 puertos más delicados de tus equipos (21, 23, 445 y 3389).</p>
+            <div class="io-help-tip"><strong>En el escaneo real:</strong> Java espaciará cada prueba exactamente a este ritmo para evitar ráfagas bruscas.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_tasa_x2" class="io-help-popover" role="dialog" aria-label="Explicación de Tasa óptima comunes">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Resultado calculado</div>
+                <div class="io-help-pop-title">Tasa óptima comunes (X₂*)</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Indica cuántos <strong>pps (paquetes por segundo)</strong> enviará el escáner hacia los 5 puertos habituales de trabajo diario (SSH 22, DNS 53 y páginas web 80, 443 y 8080).</p>
+            <div class="io-help-tip"><strong>Suma total:</strong> X₁* + X₂* es el total de paquetes por segundo que circularán durante la auditoría.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_efectividad_z" class="io-help-popover" role="dialog" aria-label="Explicación de Efectividad máxima">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Puntaje logrado</div>
+                <div class="io-help-pop-title">Efectividad máxima (Z*)</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Es la <strong>puntuación total de provecho</strong> que logra tu configuración actual respetando los tres límites de la izquierda.</p>
+            <p>El texto pequeño debajo te indica de forma sencilla qué factores marcaron el punto de equilibrio.</p>
+            <div class="io-help-tip"><strong>Lectura rápida:</strong> Más puntos significa un barrido más veloz dentro de tu margen 100% seguro.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_trafico_recursos" class="io-help-popover" role="dialog" aria-label="Explicación de Tráfico y uso de recursos">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Consumo real</div>
+                <div class="io-help-pop-title">Tráfico y uso de recursos</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Muestra cuánta velocidad de red ocupará realmente el escáner (en <strong>KB/s</strong> y en <strong>Mbps</strong>) y qué porcentaje del margen seguro del firewall aprovechará.</p>
+            <div class="io-help-tip"><strong>Tranquilidad:</strong> Incluso al 100% del margen fijado, sigues dentro de la zona segura anti-bloqueo.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_vertices" class="io-help-popover" role="dialog" aria-label="Explicación de Vértices factibles evaluados">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Candidatos probados</div>
+                <div class="io-help-pop-title">¿Qué son los vértices factibles?</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>En lugar de adivinar al azar, Python calcula las <strong>"esquinas"</strong> exactas donde se cruzan tus límites seguros.</p>
+            <p>Cada etiqueta muestra una combinación válida <strong>(críticos pps, comunes pps) → Puntaje Z</strong>.</p>
+            <div class="io-help-tip"><strong>La estrella ★:</strong> Señala la combinación ganadora que se aplicará automáticamente al escáner.</div>
+        </div>
+    </div>
+
+    <div id="ioHelp_resumen" class="io-help-popover" role="dialog" aria-label="Explicación del resumen final">
+        <div class="io-help-pop-header">
+            <div>
+                <div class="io-help-pop-tag">Conclusión en claro</div>
+                <div class="io-help-pop-title">Resumen práctico de tu configuración</div>
+            </div>
+            <button type="button" class="io-help-close" onclick="closeAllIoHelpPopovers()" aria-label="Cerrar">&times;</button>
+        </div>
+        <div class="io-help-pop-body">
+            <p>Traduce todos los datos del modelo en una sola explicación cotidiana para confirmar cómo trabajará VulneraSolve cuando pulses <strong>"Iniciar auditoría de red"</strong>.</p>
+            <div class="io-help-tip"><strong>En vivo:</strong> Se actualiza al instante al mover barras, cambiar de modo o usar <strong>Autocalibrar</strong>.</div>
+        </div>
+    </div>
+
+    <!-- ==========================================================
          BOTÓN FLOTANTE Y CHATBOT ASISTENTE (GEMINI 3.5 FLASH LITE)
          ========================================================== -->
     <div id="chatFab" class="chat-fab" onclick="toggleChatWidget()" title="Abrir asistente de ciberseguridad">
@@ -2400,13 +3620,28 @@
             fetchInitialStatus();
             fetchCurrentUser();
             fetchAuditHistory();
+            updateIoLocalLabels();
+            requestIoOptimization();
 
-            // Cerrar popover al hacer clic fuera
+            // Cerrar popovers al hacer clic fuera o presionar Escape
             document.addEventListener('click', function(e) {
                 const popover = document.getElementById('vulnPopover');
-                if (!popover.contains(e.target) && !e.target.closest('.risk-badge')) {
+                if (popover && !popover.contains(e.target) && !e.target.closest('.risk-badge')) {
                     hidePopoverImmediate();
                 }
+                if (!e.target.closest('.io-help-popover') && !e.target.closest('.io-help-btn')) {
+                    closeAllIoHelpPopovers();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAllIoHelpPopovers();
+                }
+            });
+
+            window.addEventListener('resize', function() {
+                repositionActiveIoHelpPopover();
             });
         };
 
@@ -2498,6 +3733,277 @@
             });
         }
 
+
+        // ==========================================================
+        // MOTOR INTERACTIVO DE INVESTIGACIÓN DE OPERACIONES (I.O.)
+        // ==========================================================
+        let ioDebounceTimer = null;
+        let activeIoHelpPopoverId = null;
+        let activeIoHelpTriggerEl = null;
+        let lastIoSolution = {
+            x1Optimo: 50,
+            x2Optimo: 50,
+            zMaximo: 125.0,
+            modoOperacion: 'Modo Balanceado (Óptimo estándar)'
+        };
+
+        function toggleIoPanel() {
+            const card = document.getElementById('ioPanelCard');
+            const label = document.getElementById('ioCollapseLabel');
+            if (!card || !label) return;
+            closeAllIoHelpPopovers();
+            card.classList.toggle('collapsed');
+            label.textContent = card.classList.contains('collapsed')
+                ? 'Mostrar controles de I.O.'
+                : 'Ocultar controles de I.O.';
+        }
+
+        function closeAllIoHelpPopovers() {
+            document.querySelectorAll('.io-help-popover.active').forEach(pop => {
+                pop.classList.remove('active');
+            });
+            document.querySelectorAll('.io-help-btn.active').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            activeIoHelpPopoverId = null;
+            activeIoHelpTriggerEl = null;
+        }
+
+        function positionIoHelpPopover(popover, triggerEl) {
+            if (!popover || !triggerEl) return;
+            const rect = triggerEl.getBoundingClientRect();
+            const popWidth = Math.min(348, window.innerWidth - 28);
+            const popHeight = popover.offsetHeight || 210;
+
+            let left = rect.left + (rect.width / 2) - (popWidth / 2);
+            if (left < 14) left = 14;
+            if (left + popWidth > window.innerWidth - 14) {
+                left = window.innerWidth - popWidth - 14;
+            }
+
+            let top = rect.bottom + 10;
+            if (top + popHeight > window.innerHeight - 14) {
+                top = rect.top - popHeight - 10;
+            }
+            if (top < 14) top = 14;
+
+            popover.style.left = `${Math.round(left)}px`;
+            popover.style.top = `${Math.round(top)}px`;
+        }
+
+        function repositionActiveIoHelpPopover() {
+            if (!activeIoHelpPopoverId || !activeIoHelpTriggerEl) return;
+            const pop = document.getElementById(activeIoHelpPopoverId);
+            if (pop && pop.classList.contains('active')) {
+                positionIoHelpPopover(pop, activeIoHelpTriggerEl);
+            }
+        }
+
+        function toggleIoHelp(popoverId, triggerEl, event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            const targetPop = document.getElementById(popoverId);
+            if (!targetPop) return;
+
+            const wasAlreadyOpen = (activeIoHelpPopoverId === popoverId) && targetPop.classList.contains('active');
+            closeAllIoHelpPopovers();
+            hidePopoverImmediate();
+
+            if (wasAlreadyOpen) {
+                return;
+            }
+
+            activeIoHelpPopoverId = popoverId;
+            activeIoHelpTriggerEl = triggerEl;
+            triggerEl.classList.add('active');
+            positionIoHelpPopover(targetPop, triggerEl);
+
+            requestAnimationFrame(() => {
+                positionIoHelpPopover(targetPop, triggerEl);
+                targetPop.classList.add('active');
+            });
+        }
+
+        function toggleIoWeightsDrawer() {
+            const drawer = document.getElementById('ioWeightsDrawer');
+            if (drawer) drawer.classList.toggle('open');
+        }
+
+        function resetIoWeights() {
+            document.getElementById('ioInputC1').value = '1.5';
+            document.getElementById('ioInputC2').value = '1.0';
+            onIoSliderInput();
+        }
+
+        function applyIoPreset(presetName) {
+            document.querySelectorAll('.io-preset-btn').forEach(b => b.classList.remove('active'));
+            const idsSlider = document.getElementById('ioSliderIds');
+            const bwSlider = document.getElementById('ioSliderBw');
+            const critSlider = document.getElementById('ioSliderCrit');
+            document.getElementById('ioInputC1').value = '1.5';
+            document.getElementById('ioInputC2').value = '1.0';
+
+            if (presetName === 'sigiloso') {
+                idsSlider.value = 50;
+                bwSlider.value = 80;
+                critSlider.value = 50;
+                document.getElementById('presetSigiloso').classList.add('active');
+            } else if (presetName === 'agresivo') {
+                idsSlider.value = 200;
+                bwSlider.value = 300;
+                critSlider.value = 40;
+                document.getElementById('presetAgresivo').classList.add('active');
+            } else {
+                idsSlider.value = 100;
+                bwSlider.value = 150;
+                critSlider.value = 40;
+                document.getElementById('presetBalanceado').classList.add('active');
+            }
+
+            updateIoLocalLabels();
+            requestIoOptimization();
+        }
+
+        function getIoRequestPayload() {
+            const ids = parseFloat(document.getElementById('ioSliderIds').value) || 100;
+            const bw = parseFloat(document.getElementById('ioSliderBw').value) || 150;
+            const critPct = parseFloat(document.getElementById('ioSliderCrit').value) || 40;
+            const c1 = parseFloat(document.getElementById('ioInputC1').value) || 1.5;
+            const c2 = parseFloat(document.getElementById('ioInputC2').value) || 1.0;
+
+            return {
+                limiteIdsPps: ids,
+                anchoBandaKbs: bw,
+                porcentajeCriticoMin: critPct / 100.0,
+                pesoCritico: c1,
+                pesoComun: c2
+            };
+        }
+
+        function updateIoLocalLabels() {
+            const p = getIoRequestPayload();
+            const mbps = ((p.anchoBandaKbs * 8.0) / 1000.0).toFixed(2);
+            const ratioFactor = ((1.0 - p.porcentajeCriticoMin) / p.porcentajeCriticoMin).toFixed(2);
+
+            document.getElementById('ioValIds').textContent = `${p.limiteIdsPps} pps`;
+            document.getElementById('ioValBw').textContent = `${p.anchoBandaKbs} KB/s (~${mbps} Mbps)`;
+            document.getElementById('ioValCrit').textContent = `${Math.round(p.porcentajeCriticoMin * 100)}%`;
+
+            document.getElementById('ioEqR1').textContent = `X₁ + X₂ ≤ ${p.limiteIdsPps} pps`;
+            document.getElementById('ioEqR2').textContent = `2.0X₁ + 1.0X₂ ≤ ${p.anchoBandaKbs} KB/s`;
+            document.getElementById('ioEqR3').textContent = `X₂ ≤ ${ratioFactor} X₁`;
+            document.getElementById('ioObjectiveFormula').textContent = `Max Z = ${p.pesoCritico.toFixed(1)}(X₁) + ${p.pesoComun.toFixed(1)}(X₂)`;
+        }
+
+        function syncPresetButtonsHighlight() {
+            const p = getIoRequestPayload();
+            const pct = Math.round(p.porcentajeCriticoMin * 100);
+            const defaultWeights = Math.abs(p.pesoCritico - 1.5) < 0.01 && Math.abs(p.pesoComun - 1.0) < 0.01;
+            document.querySelectorAll('.io-preset-btn').forEach(b => b.classList.remove('active'));
+
+            if (!defaultWeights) return;
+            if (p.limiteIdsPps === 50 && p.anchoBandaKbs === 80 && pct === 50) {
+                document.getElementById('presetSigiloso').classList.add('active');
+            } else if (p.limiteIdsPps === 100 && p.anchoBandaKbs === 150 && pct === 40) {
+                document.getElementById('presetBalanceado').classList.add('active');
+            } else if (p.limiteIdsPps === 200 && p.anchoBandaKbs === 300 && pct === 40) {
+                document.getElementById('presetAgresivo').classList.add('active');
+            }
+        }
+
+        function onIoSliderInput() {
+            updateIoLocalLabels();
+            syncPresetButtonsHighlight();
+            if (ioDebounceTimer) clearTimeout(ioDebounceTimer);
+            ioDebounceTimer = setTimeout(requestIoOptimization, 110);
+        }
+
+        function requestIoOptimization() {
+            const payload = getIoRequestPayload();
+            fetch('/api/io/optimizar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(data => {
+                lastIoSolution = data;
+                renderIoSolution(data);
+            })
+            .catch(err => {
+                console.warn('Error consultando /api/io/optimizar:', err);
+            });
+        }
+
+        function translateIoIntersectionFriendly(inter) {
+            if (!inter) return 'Punto óptimo dentro de tus límites seguros';
+            if (inter.includes('R1') && inter.includes('R2')) return 'Equilibrio ideal entre firewall y red';
+            if (inter.includes('R1') && inter.includes('R3')) return 'Equilibrio entre firewall y prioridad crítica';
+            if (inter.includes('R2') && inter.includes('R3')) return 'Equilibrio entre red y prioridad crítica';
+            if (inter.includes('R2') && (inter.includes('R5') || inter.includes('X2>=0'))) return 'Máximo enfoque crítico permitido por tu red';
+            if (inter.includes('R1') && (inter.includes('R5') || inter.includes('X2>=0'))) return 'Máximo enfoque crítico permitido por el firewall';
+            return 'Punto óptimo dentro de tus límites seguros';
+        }
+
+        function renderIoSolution(sol) {
+            if (!sol) return;
+            const fmtNum = n => {
+                const val = Number(n);
+                return Math.abs(val - Math.round(val)) < 0.05 ? String(Math.round(val)) : val.toFixed(1);
+            };
+
+            const x1Str = fmtNum(sol.x1Optimo ?? 50);
+            const x2Str = fmtNum(sol.x2Optimo ?? 50);
+            const zStr = fmtNum(sol.zMaximo ?? 125);
+            const bwKbs = fmtNum(sol.consumoAnchoBandaKbs ?? 150);
+            const bwMbps = Number(sol.consumoAnchoBandaMbps ?? 1.2).toFixed(2);
+            const idsPct = fmtNum(sol.usoIdsPorcentaje ?? 100);
+            const critPct = fmtNum(sol.proporcionCriticaReal ?? 50);
+
+            document.getElementById('ioOutX1').textContent = `${x1Str} pps`;
+            document.getElementById('ioOutX2').textContent = `${x2Str} pps`;
+            document.getElementById('ioOutZ').textContent = `${zStr} pts`;
+            document.getElementById('ioOutInterseccion').textContent =
+                sol.interseccionAmigable || translateIoIntersectionFriendly(sol.interseccionOptima);
+            document.getElementById('ioOutBwUsed').textContent = `${bwKbs} KB/s (~${bwMbps} Mbps)`;
+            document.getElementById('ioOutResourcePct').textContent =
+                `Margen firewall: ${idsPct}% • Atención crítica: ${critPct}%`;
+            document.getElementById('ioModeLabel').textContent = sol.modoOperacion || 'Modo Adaptativo';
+            document.getElementById('ioCollapsedSummary').textContent =
+                `${x1Str} + ${x2Str} pps • ${bwMbps} Mbps • ${zStr} pts`;
+
+            if (sol.explicacion) {
+                document.getElementById('ioExplanationText').textContent = sol.explicacion;
+            }
+
+            // Actualizar estado de conexión del microservicio Python
+            const badge = document.getElementById('ioEngineBadge');
+            const badgeText = document.getElementById('ioEngineText');
+            if (sol.microservicioActivo) {
+                badge.classList.remove('fallback');
+                badgeText.textContent = 'Microservicio Python • Activo';
+            } else {
+                badge.classList.add('fallback');
+                badgeText.textContent = 'Motor Analítico • Respaldo Local';
+            }
+
+            // Renderizar chips de vértices factibles
+            const chipsBox = document.getElementById('ioVerticesChips');
+            if (chipsBox && Array.isArray(sol.verticesFactibles)) {
+                chipsBox.innerHTML = sol.verticesFactibles.map(v => {
+                    const isOpt = Math.abs(v.x1 - sol.x1Optimo) < 0.05 && Math.abs(v.x2 - sol.x2Optimo) < 0.05;
+                    const cls = isOpt ? 'io-vertex-chip optimal' : 'io-vertex-chip';
+                    const star = isOpt ? '★ ' : '';
+                    return `<span class="${cls}" title="Combinación candidata evaluada">${star}(${fmtNum(v.x1)}, ${fmtNum(v.x2)}) → Z=${fmtNum(v.z)}</span>`;
+                }).join('');
+            }
+        }
+
         // ==========================================
         // Control de Escaneo
         // ==========================================
@@ -2531,7 +4037,11 @@
             progressBox.classList.add('scanning'); // Activar animación Shimmer
             document.getElementById('scanStatusMsg').textContent = 'Solicitando inicio de escaneo a la interfaz...';
 
-            fetch('/api/scan', { method: 'POST' })
+            fetch('/api/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(getIoRequestPayload())
+            })
                 .then(res => {
                     if (res.status === 403) {
                         throw new Error('Acceso denegado (403): Solo los administradores tienen autorización para iniciar auditorías de red.');
@@ -3305,6 +4815,7 @@
                 subnet: document.getElementById('displaySubnet').textContent,
                 gateway: document.getElementById('displayGateway').textContent,
                 totalDiscovered: devices.length,
+                optimizacionIoAplicada: lastIoSolution,
                 devices: devices
             };
 
@@ -3340,12 +4851,8 @@
                     }
                     renderAuditHistoryTable();
 
-                    // Si la tabla superior está vacía y hay registros históricos,
-                    // cargar automáticamente la auditoría más reciente para que tanto
-                    // auditores como administradores tengan información de inmediato.
-                    if (devices.length === 0 && auditHistory.length > 0 && loadedAuditId === null) {
-                        loadAuditDetails(auditHistory[0].id, false);
-                    }
+                    // La vista principal inicia limpia por defecto. El usuario puede
+                    // pulsar "Inspeccionar" en el historial cuando desee ver un reporte anterior.
                 })
                 .catch(err => {
                     console.warn('No se pudo obtener el historial de auditorías:', err);

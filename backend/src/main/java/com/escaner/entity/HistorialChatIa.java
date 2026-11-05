@@ -18,7 +18,7 @@ public class HistorialChatIa {
     private String respuesta;
 
     @Column(length = 60)
-    private String modelo = "gemini-3.5-flash-lite";
+    private String modelo = "gemini-3.1-flash-lite";
 
     @Column(name = "tokens_consumidos")
     private Integer tokensConsumidos;
@@ -40,7 +40,7 @@ public class HistorialChatIa {
     public HistorialChatIa(String pregunta, String respuesta, String modelo, Usuario usuario, Auditoria auditoria) {
         this.pregunta = pregunta;
         this.respuesta = respuesta;
-        this.modelo = modelo != null ? modelo : "gemini-3.5-flash-lite";
+        this.modelo = modelo != null ? modelo : "gemini-3.1-flash-lite";
         this.usuario = usuario;
         this.auditoria = auditoria;
         this.fechaHora = LocalDateTime.now();
