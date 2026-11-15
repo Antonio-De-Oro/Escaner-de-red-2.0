@@ -66,7 +66,7 @@ public class GeminiChatService {
 
     /**
      * Procesa la consulta del usuario enviando el contexto de la auditoría y el historial conversacional
-     * a Google Gemini 3.5 Flash Lite y persiste la interacción en MariaDB.
+     * a Google Gemini 3.1 Flash Lite y persiste la interacción en MariaDB.
      */
     @Transactional
     public Map<String, Object> procesarMensaje(String pregunta, Long auditoriaId, String username) {
@@ -314,7 +314,7 @@ public class GeminiChatService {
             sb.append("2. **En equipos Linux / Routers**:\n");
             sb.append("   ```bash\n   sudo systemctl stop telnet\n   sudo systemctl disable telnet\n   ```\n");
         } else {
-            sb.append("Por favor asegúrate de contar con acceso a internet y una clave de API válida para Google Gemini 3.5 Flash Lite configurada en `GEMINI_API_KEY`.\n");
+            sb.append("Por favor asegúrate de contar con acceso a internet y una clave de API válida para Google Gemini 3.1 Flash Lite configurada en `GEMINI_API_KEY`.\n");
         }
 
         return sb.toString();

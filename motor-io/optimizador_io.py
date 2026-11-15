@@ -50,22 +50,15 @@ sin depender de paquetes pesados externos. Esto garantiza dos ventajas clave:
 
 from __future__ import annotations
 
-import http.client
 import json
-import re
-import socket
-import ssl
-import statistics
-import subprocess
 import sys
-import time
 from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, List, Optional, Tuple
 
 
 # ==================================================================================
-# CONFIGURACIÓN DE RED DEL MICROSERVICIO Y AUTOCALIBRACIÓN NO INTRUSIVA
+# CONFIGURACIÓN DE RED Y PRECISIÓN NUMÉRICA DEL MICROSERVICIO
 # ==================================================================================
 # HOST "127.0.0.1" asegura que el microservicio escuche únicamente conexiones locales
 # provenientes del backend Spring Boot en la misma máquina (seguridad por diseño).
@@ -75,15 +68,6 @@ PUERTO_MICROSERVICIO = 8001
 # Tolerancia numérica para comparaciones de punto flotante (evita que errores de
 # redondeo binario como 100.00000000000001 descarten un vértice legítimo).
 EPSILON = 1e-7
-
-# Parámetros de la sonda híbrida de autocalibración y Regla de No Intrusión:
-# Se asigna únicamente el 1.0% del ancho de banda disponible medido para que el
-# escáner trabaje en segundo plano sin afectar videollamadas ni aplicaciones LAN.
-PORCENTAJE_NO_INTRUSION = 1.0
-FASE_SUBIDA_SEGUNDOS = 3.5     # Fase 1: superar TCP Slow-Start hasta alcanzar el pico máximo
-FASE_PROMEDIO_SEGUNDOS = 2.3   # Fase 2: promediar el caudal ya estabilizado (~5.8 s totales)
-MIN_SLIDER_BW_KBS = 40.0
-MAX_SLIDER_BW_KBS = 800.0
 
 
 # ==================================================================================

@@ -1389,7 +1389,7 @@
         }
 
         /* ==========================================
-           Widget y Chatbot VulneraBot (Gemini 3.5 Flash Lite)
+           Widget y Chatbot VulneraBot (Gemini 3.1 Flash Lite)
            ========================================== */
         .chat-fab {
             position: fixed;
@@ -3244,7 +3244,7 @@
             <p>&bull; <strong>Sigiloso:</strong> Va despacio (50 pps = 50 paquetes por segundo) y casi no gasta red. Ideal en oficinas con videollamadas o firewalls estrictos.<br>
                &bull; <strong>Balanceado:</strong> Punto medio ideal (100 pps). Rápido, seguro y ligero para el día a día.<br>
                &bull; <strong>Agresivo:</strong> Doble de velocidad (200 pps). Ideal para laboratorios o pruebas cuando tienes prisa.</p>
-            <div class="io-help-tip"><strong>Consejo:</strong> Si no sabes cuál elegir, usa <strong>Modo Balanceado</strong> o pulsa <strong>Autocalibrar</strong>.</div>
+            <div class="io-help-tip"><strong>Consejo:</strong> Si no sabes cuál elegir, usa <strong>Modo Balanceado</strong> para equilibrar velocidad y sigilo en redes LAN.</div>
         </div>
     </div>
 
@@ -3450,12 +3450,12 @@
         </div>
         <div class="io-help-pop-body">
             <p>Traduce todos los datos del modelo en una sola explicación cotidiana para confirmar cómo trabajará VulneraSolve cuando pulses <strong>"Iniciar auditoría de red"</strong>.</p>
-            <div class="io-help-tip"><strong>En vivo:</strong> Se actualiza al instante al mover barras, cambiar de modo o usar <strong>Autocalibrar</strong>.</div>
+            <div class="io-help-tip"><strong>En vivo:</strong> Se actualiza al instante cada vez que ajustas las barras o seleccionas uno de los tres modos operativos.</div>
         </div>
     </div>
 
     <!-- ==========================================================
-         BOTÓN FLOTANTE Y CHATBOT ASISTENTE (GEMINI 3.5 FLASH LITE)
+         BOTÓN FLOTANTE Y CHATBOT ASISTENTE (GEMINI 3.1 FLASH LITE)
          ========================================================== -->
     <div id="chatFab" class="chat-fab" onclick="toggleChatWidget()" title="Abrir asistente de ciberseguridad">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#04111d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -3488,7 +3488,7 @@
                     <h3>Asistente inteligente VulneraBot</h3>
                     <div class="chat-status-pill">
                         <span class="chat-status-dot"></span>
-                        <span>Gemini 3.5 Flash Lite &bull; Conectado</span>
+                        <span>Gemini 3.1 Flash Lite &bull; Conectado</span>
                     </div>
                 </div>
             </div>
@@ -3525,10 +3525,10 @@
         <!-- Mensajes del Chat -->
         <div class="chat-messages" id="chatMessages">
             <div class="msg-bubble msg-bot">
-                <p>¡Hola! Soy <strong>VulneraBot</strong>, tu asistente de ciberseguridad impulsado por <strong>Gemini 3.5 Flash Lite</strong>.</p>
+                <p>¡Hola! Soy <strong>VulneraBot</strong>, tu asistente de ciberseguridad impulsado por <strong>Gemini 3.1 Flash Lite</strong>.</p>
                 <p style="margin-top: 6px;">Tengo acceso a los hallazgos y puertos de la red auditada. Pregúntame cómo solucionar los puertos críticos, qué comandos ejecutar o cualquier duda sobre seguridad.</p>
                 <div class="msg-meta">
-                    <span>VulneraBot &bull; Gemini 3.5 Flash Lite</span>
+                    <span>VulneraBot &bull; Gemini 3.1 Flash Lite</span>
                 </div>
             </div>
 
@@ -5065,7 +5065,7 @@
         }
 
         // ==========================================
-        // Asistente Inteligente VulneraBot (Gemini 3.5 Flash Lite)
+        // Asistente Inteligente VulneraBot (Gemini 3.1 Flash Lite)
         // ==========================================
         let isChatOpen = false;
         let isChatHistoryLoaded = false;
@@ -5217,7 +5217,7 @@
             bubble.innerHTML = `
                 <div>${formattedHtml}</div>
                 <div class="msg-meta">
-                    <span>VulneraBot &bull; ${escapeHtml(modelName || 'Gemini 3.5 Flash Lite')}</span>
+                    <span>VulneraBot &bull; ${escapeHtml(modelName || 'Gemini 3.1 Flash Lite')}</span>
                     <span>${timeStr}</span>
                 </div>
             `;
@@ -5322,7 +5322,7 @@
                             botBubble.innerHTML = `
                                 <div>${botHtml}</div>
                                 <div class="msg-meta">
-                                    <span>VulneraBot &bull; ${escapeHtml(item.modelo || 'Gemini 3.5 Flash Lite')}</span>
+                                    <span>VulneraBot &bull; ${escapeHtml(item.modelo || 'Gemini 3.1 Flash Lite')}</span>
                                     <span>${userTime}</span>
                                 </div>
                             `;
@@ -5345,10 +5345,10 @@
                     const container = document.getElementById('chatMessages');
                     container.innerHTML = `
                         <div class="msg-bubble msg-bot">
-                            <p>¡Hola! Conversación reiniciada. Soy <strong>VulneraBot</strong>, tu asistente de ciberseguridad impulsado por <strong>Gemini 3.5 Flash Lite</strong>.</p>
+                            <p>¡Hola! Conversación reiniciada. Soy <strong>VulneraBot</strong>, tu asistente de ciberseguridad impulsado por <strong>Gemini 3.1 Flash Lite</strong>.</p>
                             <p style="margin-top: 6px;">Tengo acceso a los hallazgos y puertos de la red. ¿En qué puedo orientarte hoy?</p>
                             <div class="msg-meta">
-                                <span>VulneraBot &bull; Gemini 3.5 Flash Lite</span>
+                                <span>VulneraBot &bull; Gemini 3.1 Flash Lite</span>
                             </div>
                         </div>
                         <div class="typing-indicator" id="typingIndicator">

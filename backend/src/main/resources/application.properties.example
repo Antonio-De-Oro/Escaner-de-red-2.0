@@ -1,0 +1,40 @@
+# ==============================================================================
+# VULNERASOLVE 2.0 - PLANTILLA DE CONFIGURACIÓN (EJEMPLO SIN CREDENCIALES)
+# ==============================================================================
+# INSTRUCCIONES:
+#   1. Copia este archivo como `application.properties` en esta misma carpeta
+#      (backend/src/main/resources/application.properties) si vas a personalizar
+#      tu entorno local.
+#   2. Completa tu usuario y contraseña de MariaDB/MySQL en tu copia local.
+#   3. Define la variable de entorno GEMINI_API_KEY (o en tu archivo .env local)
+#      sin subir claves reales al repositorio de GitHub.
+# ==============================================================================
+
+# Puerto HTTP del servidor embebido Apache Tomcat (Spring Boot)
+server.port=8080
+
+# Parámetros base del motor de escaneo de red LAN (ajustables dinámicamente vía I.O.)
+scanner.thread-pool-size=30
+scanner.ping-timeout-ms=400
+scanner.port-timeout-ms=250
+
+# Conexión a Base de Datos MariaDB / MySQL (se crea el esquema si no existe)
+spring.datasource.url=jdbc:mariadb://localhost:3306/vulnerasolve?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+spring.datasource.username=TU_USUARIO_MARIADB
+spring.datasource.password=TU_CONTRASENA_MARIADB
+
+# Hibernate / Spring Data JPA (actualización automática de tablas en el primer arranque)
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MariaDBDialect
+
+# Configuración del Asistente Inteligente VulneraBot (Google Gemini API)
+# Nunca escribas tu clave real aquí si vas a subir cambios a Git; usa la variable GEMINI_API_KEY
+gemini.api.key=${GEMINI_API_KEY:}
+gemini.model=gemini-3.1-flash-lite
+gemini.api.url=https://generativelanguage.googleapis.com/v1beta/models
+
+# Microservicio local de Optimización Matemática (Investigación de Operaciones)
+io.service.url=http://127.0.0.1:8001
+# Si está en true, Spring Boot intenta iniciar automáticamente motor-io/optimizador_io.py al arrancar
+io.service.auto-start=true

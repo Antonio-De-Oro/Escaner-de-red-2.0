@@ -1,0 +1,32 @@
+# === Variables de entorno y secretos locales ===
+.env
+.env.*
+!.env.example
+
+# === Java / Maven ===
+target/
+**/target/
+*.jar
+*.war
+*.class
+
+# === Python (microservicio I.O.) ===
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# === Documentos Word / entregables binarios locales ===
+*.docx
+~$*.docx
+Recursos/
+
+# === IDEs y sistema operativo ===
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+*.log

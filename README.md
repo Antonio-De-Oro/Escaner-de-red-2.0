@@ -6,7 +6,7 @@
 [![Spring Boot 3.2](https://img.shields.io/badge/Spring_Boot-3.2.0-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Python 3](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![MariaDB](https://img.shields.io/badge/MariaDB-10.4+-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-API-8E75C2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-3.1_Flash_Lite-8E75C2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
 [![Security RBAC](https://img.shields.io/badge/Security-Spring_Security_6-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)](https://spring.io/projects/spring-security)
 
 ---
@@ -26,11 +26,11 @@ Realizar auditorías internas tradicionales suele ser complejo: las herramientas
 
 ## 🚀 Características Principales
 
-* 🔍 **Descubrimiento y Mapeo LAN:** Detección automática de interfaz de red, barrido de hosts activos mediante ARP e ICMP, y escaneo de puertos TCP clave (HTTP, HTTPS, SMB, RDP, FTP, Telnet, MySQL, etc.).
-* ⚡ **Regulación Adaptativa de Tráfico:** Sistema `AdaptiveRateLimiter` en nanosegundos que evita ráfagas abruptas de tráfico mediante un algoritmo de cubeta de tokens (*token bucket*).
-* 📐 **Motor de Optimización Simplex:** Microservicio independiente en Python que resuelve analíticamente el modelo matemático de I.O., con un motor de contingencia integrado en Java para máxima disponibilidad.
+* 🔍 **Descubrimiento y Mapeo LAN:** Detección automática de interfaz de red, verificación de hosts activos mediante sondeo ICMP y sockets TCP, lectura de direcciones MAC e identificación de fabricante (OUI) y sistema operativo, además de escaneo de los puertos TCP más relevantes (`21`, `22`, `23`, `53`, `80`, `443`, `445`, `3389`, `8080`).
+* ⚡ **Regulación Adaptativa de Tráfico:** Sistema `AdaptiveRateLimiter` en nanosegundos que espacia cada socket saliente mediante reserva temporal atómica (`AtomicLong`) para evitar ráfagas abruptas de tráfico en la red.
+* 📐 **Motor de Programación Lineal (I.O.):** Microservicio independiente en Python que resuelve analíticamente el modelo matemático mediante intersección exacta de restricciones (Regla de Cramer y teorema de vértices extremos), con un resolvedor de contingencia integrado en Java para máxima disponibilidad.
 * 🎚️ **Modos de Escaneo Preconfigurados e Interactivos:**
-  * **Modo Sigiloso (30 pps):** Diseñado para redes estrictas con firewalls sensibles.
+  * **Modo Sigiloso (50 pps totales: 30 críticos / 20 comunes):** Diseñado para redes estrictas con firewalls sensibles ($Z^* = 65$).
   * **Modo Balanceado (100 pps):** Punto de equilibrio matemáticamente óptimo ($Z^* = 125$).
   * **Modo Agresivo (200 pps):** Máxima velocidad para laboratorios o pruebas controladas.
   * **Controles deslizantes manuales:** Permiten experimentar y personalizar las tasas en vivo desde el navegador.
@@ -48,10 +48,10 @@ La solución está construida sobre una arquitectura desacoplada en capas:
 
 ### Capas y Componentes:
 * **Frontend (Presentación):** HTML5 semántico, interfaz moderna con temática oscura de ciberseguridad, controles deslizantes interactivos y WebSockets STOMP para recibir notificaciones asíncronas en vivo.
-* **Backend (Spring Boot 3.2):** Controladores REST y servicios de negocio protegidos con **Spring Security 6**. Orquesta el escaneo multihilo (`ThreadPoolExecutor`) y el regulador de tráfico (`AdaptiveRateLimiter`).
-* **Motor Matemático (Python Microservice / `motor-io`):** Servicio ligero en Python (puerto `8001`) que resuelve el problema de programación lineal mediante álgebra exacta (Regla de Cramer / Simplex).
-* **Capa de Persistencia (MariaDB 10):** Repositorios Spring Data JPA que almacenan usuarios, roles, auditorías, dispositivos descubiertos, puertos abiertos e historial del chat.
-* **Capa de Inteligencia Artificial (Google Gemini Cloud):** Integración segura vía HTTP REST con modelos Gemini para proveer asesoría técnica defensiva contextualizada.
+* **Backend (Spring Boot 3.2):** Controladores REST y servicios de negocio protegidos con **Spring Security 6**. Orquesta el escaneo multihilo (`ExecutorService` / `CompletableFuture`) y el regulador de tráfico (`AdaptiveRateLimiter`).
+* **Motor Matemático (Python Microservice / `motor-io`):** Servicio ligero en Python 3 estándar (puerto `8001`, sin librerías externas) que resuelve el problema de programación lineal mediante álgebra exacta (Regla de Cramer / vértices extremos).
+* **Capa de Persistencia (MariaDB):** Repositorios Spring Data JPA que almacenan usuarios, roles, auditorías, dispositivos descubiertos, puertos abiertos e historial del chat.
+* **Capa de Inteligencia Artificial (Google Gemini Cloud):** Integración segura vía HTTP REST con el modelo **Gemini 3.1 Flash Lite** (`gemini-3.1-flash-lite`) para proveer asesoría técnica defensiva contextualizada.
 
 ---
 
@@ -65,7 +65,7 @@ Para evitar que el escaneo sature el ancho de banda de la empresa o sea bloquead
 
 * **Variables de decisión:**
   * $X_1$: Tasa de paquetes por segundo dirigidos a **puertos críticos** (21, 23, 445, 3389).
-  * $X_2$: Tasa de paquetes por segundo dirigidos a **puertos comunes** (80, 443, 8080).
+  * $X_2$: Tasa de paquetes por segundo dirigidos a **puertos comunes** (22, 53, 80, 443, 8080).
 
 * **Función Objetivo:**
   $$\text{Maximizar } Z = 1.5 X_1 + 1.0 X_2$$
@@ -121,7 +121,7 @@ Al inicializar la aplicación, se configuran perfiles con permisos diferenciados
 
 | Usuario | Contraseña | Rol | Permisos |
 | :---: | :---: | :---: | :--- |
-| **`antonio`** | `antonio` | `ROLE_ADMIN` | **Administrador:** Iniciar y cancelar escaneos, configurar optimización, consultar auditorías y chatear con VulneraBot. |
+| **`antonio`** | `antonio` | `ROLE_ADMIN` | **Administrador:** Iniciar auditorías de red, aplicar optimización al motor, consultar reportes históricos y chatear con VulneraBot. |
 | **`jose`** | `jose` | `ROLE_ADMIN` | **Administrador:** Control total de auditorías y configuración técnica. |
 | **`giovanny`** | `giovanny` | `ROLE_AUDITOR` | **Auditor (Lectura):** Visualizar reportes históricos, consultar inventario de puertos y chatear con la IA. *(No puede iniciar escaneos)*. |
 | **`jesus`** | `jesus` | `ROLE_AUDITOR` | **Auditor (Lectura):** Acceso a métricas históricas y asistencia de VulneraBot. |
@@ -137,7 +137,7 @@ Al inicializar la aplicación, se configuran perfiles con permisos diferenciados
 | `GET` | `/api/status` | Autenticado | Consulta el estado operativo del escáner. |
 | `GET` | `/api/auditorias` | Autenticado | Lista el historial de auditorías realizadas. |
 | `GET` | `/api/auditorias/{id}` | Autenticado | Detalle completo de una auditoría, sus hosts y puertos. |
-| `POST` | `/api/io/optimizar` | `ROLE_ADMIN` | Envía parámetros al microservicio de I.O. y actualiza las tasas de escaneo. |
+| `POST` | `/api/io/optimizar` | Autenticado (`ADMIN` aplica al motor; `AUDITOR` simula) | Envía parámetros al microservicio de I.O.; si el usuario es `ROLE_ADMIN`, actualiza además las tasas activas del escáner. |
 | `GET` | `/api/io/estado` | Autenticado | Consulta las tasas de transmisión vigentes y disponibilidad de I.O. |
 | `POST` | `/api/chat/ask` | Autenticado | Envía una consulta técnica contextualizada a VulneraBot. |
 | `GET` | `/api/chat/historial` | Autenticado | Recupera el historial de conversación del usuario. |
@@ -151,22 +151,23 @@ Al inicializar la aplicación, se configuran perfiles con permisos diferenciados
 ### Prerrequisitos:
 * **Java:** JDK 21 o superior.
 * **Maven:** 3.8 o superior.
-* **Python:** 3.10 o superior (con `numpy` instalado para el microservicio de I.O.).
+* **Python:** 3.10 o superior (solo requiere la librería estándar nativa de Python; sin paquetes externos).
 * **MariaDB / MySQL:** Servicio activo en el puerto `3306`.
 
 ---
 
-### Paso 1: Configurar la Base de Datos
-Crea la base de datos en MariaDB ejecutando:
-```sql
-CREATE DATABASE vulnerasolve CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-*(Las tablas, roles y usuarios iniciales se generan automáticamente al iniciar Spring Boot).*
+### Paso 1: Configurar la Base de Datos y Plantillas de Entorno
+1. Crea la base de datos en MariaDB ejecutando *(también puede crearse automáticamente al arrancar)*:
+   ```sql
+   CREATE DATABASE vulnerasolve CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+   *(Las tablas, roles y usuarios iniciales se generan automáticamente al iniciar Spring Boot).*
+2. Revisa la plantilla `backend/src/main/resources/application.properties.example` y verifica en `backend/src/main/resources/application.properties` tu usuario y contraseña locales de MariaDB (`spring.datasource.username` y `spring.datasource.password`).
 
 ---
 
-### Paso 2: Clave de Google Gemini (Opcional)
-Para habilitar el chat con inteligencia artificial de VulneraBot, define la variable de entorno:
+### Paso 2: Clave de Google Gemini 3.1 Flash Lite (Opcional)
+Para habilitar las respuestas en la nube de VulneraBot con **Gemini 3.1 Flash Lite** (`gemini-3.1-flash-lite`), toma como referencia el archivo `.env.example` de la raíz y define la variable de entorno `GEMINI_API_KEY`:
 
 ```powershell
 # Windows (PowerShell)
@@ -181,10 +182,10 @@ export GEMINI_API_KEY="tu_api_key_aqui"
 
 ### Paso 3: Puesta en Marcha
 
-Se recomienda abrir dos terminales:
+Gracias a `io.service.auto-start=true`, al iniciar Spring Boot el sistema intenta lanzar automáticamente el microservicio Python en segundo plano; no obstante, también puedes ejecutarlo en una terminal separada para observar sus cálculos en tiempo real:
 
 ```bash
-# Terminal 1: Iniciar microservicio de optimización matemática (I.O.)
+# Terminal 1 (Opcional si io.service.auto-start=true): Microservicio matemático I.O.
 python motor-io/optimizador_io.py
 ```
 
@@ -195,7 +196,7 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-> ℹ️ **Nota de resiliencia:** Si ejecutas únicamente el backend de Java, VulneraSolve activará de forma transparente su **resolvedor simplex de contingencia integrado**, garantizando que la optimización y el escaneo funcionen sin interrupciones.
+> ℹ️ **Nota de resiliencia:** Si Python no está disponible o el puerto `8001` no responde, VulneraSolve activará de forma transparente su **resolvedor analítico de contingencia integrado en Java**, garantizando que la optimización y el escaneo funcionen sin interrupciones.
 
 ---
 
@@ -216,17 +217,21 @@ Escaner-de-red-2.0/
 │   │   ├── config/             # Configuración de WebSockets y carga de datos iniciales
 │   │   ├── controller/         # Endpoints REST (Auth, Scan, Auditoria, Chat, I.O.)
 │   │   ├── entity/             # Entidades JPA (Auditoria, Dispositivo, Puerto, etc.)
+│   │   ├── model/              # DTOs y mensajes en tiempo real (ScanMessage, OptimizacionRequest)
 │   │   ├── repository/         # Interfaces de persistencia Spring Data JPA
 │   │   ├── security/           # Configuración de seguridad Spring Security 6 y RBAC
 │   │   └── service/            # Lógica de escaneo LAN, RateLimiter, Gemini y cliente I.O.
 │   ├── src/main/resources/
-│   │   ├── static/             # Frontend web (HTML5, CSS3, JavaScript STOMP)
-│   │   └── application.properties # Parámetros de conexión a MariaDB y API Gemini
-│   └── pom.xml                 # Dependencias del proyecto Maven
+│   │   ├── static/             # Frontend web (index.html, login.html, logo.svg)
+│   │   ├── application.properties         # Configuración local de ejecución
+│   │   └── application.properties.example # Plantilla documentada sin credenciales
+│   └── pom.xml                 # Dependencias y metadatos del proyecto Maven
 ├── motor-io/
-│   └── optimizador_io.py       # Microservicio Python de Programación Lineal (Simplex/NumPy)
+│   └── optimizador_io.py       # Microservicio Python de Programación Lineal (StdLib / Cramer)
 ├── docs/
 │   └── img/                    # Diagramas de arquitectura, modelo E-R, I.O. y árbol de problema
+├── .env.example                # Plantilla de variables de entorno (GEMINI_API_KEY)
+├── .gitignore                  # Exclusión de binarios, secretos y archivos temporales
 └── README.md                   # Documentación oficial del proyecto
 ```
 
