@@ -2,9 +2,8 @@
 # VULNERASOLVE 2.0 - PLANTILLA DE CONFIGURACIÓN (EJEMPLO SIN CREDENCIALES)
 # ==============================================================================
 # INSTRUCCIONES:
-#   1. Copia este archivo como `application.properties` en esta misma carpeta
-#      (backend/src/main/resources/application.properties) si vas a personalizar
-#      tu entorno local.
+#   1. Copia este archivo dentro de `backend/src/main/resources/` con el nombre
+#      `application.properties` si vas a personalizar tu entorno local.
 #   2. Completa tu usuario y contraseña de MariaDB/MySQL en tu copia local.
 #   3. Define la variable de entorno GEMINI_API_KEY (o en tu archivo .env local)
 #      sin subir claves reales al repositorio de GitHub.

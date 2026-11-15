@@ -162,7 +162,7 @@ Al inicializar la aplicación, se configuran perfiles con permisos diferenciados
    CREATE DATABASE vulnerasolve CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
    *(Las tablas, roles y usuarios iniciales se generan automáticamente al iniciar Spring Boot).*
-2. Revisa la plantilla `backend/src/main/resources/application.properties.example` y verifica en `backend/src/main/resources/application.properties` tu usuario y contraseña locales de MariaDB (`spring.datasource.username` y `spring.datasource.password`).
+2. Revisa la plantilla `application.properties.example` ubicada en la raíz del proyecto y verifica o copia su configuración en `backend/src/main/resources/application.properties` con tu usuario y contraseña locales de MariaDB (`spring.datasource.username` y `spring.datasource.password`).
 
 ---
 
@@ -223,8 +223,7 @@ Escaner-de-red-2.0/
 │   │   └── service/            # Lógica de escaneo LAN, RateLimiter, Gemini y cliente I.O.
 │   ├── src/main/resources/
 │   │   ├── static/             # Frontend web (index.html, login.html, logo.svg)
-│   │   ├── application.properties         # Configuración local de ejecución
-│   │   └── application.properties.example # Plantilla documentada sin credenciales
+│   │   └── application.properties         # Configuración local de ejecución
 │   └── pom.xml                 # Dependencias y metadatos del proyecto Maven
 ├── motor-io/
 │   └── optimizador_io.py       # Microservicio Python de Programación Lineal (StdLib / Cramer)
@@ -232,6 +231,7 @@ Escaner-de-red-2.0/
 │   └── img/                    # Diagramas de arquitectura, modelo E-R, I.O. y árbol de problema
 ├── .env.example                # Plantilla de variables de entorno (GEMINI_API_KEY)
 ├── .gitignore                  # Exclusión de binarios, secretos y archivos temporales
+├── application.properties.example # Plantilla documentada sin credenciales
 └── README.md                   # Documentación oficial del proyecto
 ```
 
