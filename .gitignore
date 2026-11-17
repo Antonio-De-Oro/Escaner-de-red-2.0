@@ -18,9 +18,11 @@ __pycache__/
 venv/
 .venv/
 
-# === Documentos Word / entregables binarios locales ===
+# === Documentos Word, PowerPoint / entregables binarios locales ===
 *.docx
 ~$*.docx
+*.pptx
+~$*.pptx
 Recursos/
 
 # === IDEs y sistema operativo ===
