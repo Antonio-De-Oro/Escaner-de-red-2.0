@@ -22,6 +22,10 @@ Realizar auditorías internas tradicionales suele ser complejo: las herramientas
 2. **Optimización matemática (Investigación de Operaciones):** Calcula el ritmo óptimo de envío de paquetes para maximizar la detección sin saturar el canal ni activar alarmas perimetrales.
 3. **Asistencia inteligente (VulneraBot con Google Gemini):** Interpreta los hallazgos técnicos y ofrece recomendaciones de remediación claras y comandos ejecutables listos para aplicar en Windows y Linux.
 
+### 🌳 Diagnóstico del Problema
+
+![Árbol del Problema de VulneraSolve](docs/img/arbol_del_problema_vulnerasolve.png)
+
 ---
 
 ## 🚀 Características Principales
